@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define MAXDE 6
+#define MINDE 1
+#define MAXTABLE 8
 
 typedef struct Element Element;
 typedef struct Liste Liste;
@@ -27,12 +30,15 @@ struct Pile
 
 struct Joueur
 {
-    char nom[10];
+    char *nom;
     Pile *pickominos;
-    int *table_joueur;
+    int table_joueur[8];
     int score;
 };
 
 Liste *init();
 void affichepicko(Liste *);
 int *lancede(int);
+int majTableJoueur(int *, int, int, Joueur *);
+void menu();
+Joueur *initJoueur(Joueur *, char *);

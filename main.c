@@ -5,9 +5,13 @@
 
 int main(void)
 {
-    int nbrede = 8;
-    Liste *pickomino = init();
+    int nbrede = 8, choix_menu = 0;
+    Liste *pickominos = init();
+    menu();
+    scanf("%d", &choix_menu);
+    deroulement_jeu(choix_menu, pickominos);
     /*choix_joueur(); */
-    affichepicko(pickomino);
+    // affichepicko(pickominos);
+
     return 0;
 }

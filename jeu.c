@@ -3,8 +3,6 @@
 #include <string.h>
 #include <time.h>
 #include "jeu.h"
-#define MAXDE 6
-#define MINDE 1
 
 /*int de()
 {
@@ -36,34 +34,45 @@ int *lancede(int nombrede)
         {
             printf("de%d = %d ", i, tirage);
         }
-        /*printf("tableau[%d] = %d\n",i, tablede[i-1]);*/
     }
 
     return (tablede);
 }
 
-int majTableJoueur(int *tablede, int choix_joueur, Joueur *joueur)
+int majTableJoueur(int *tablede, int taille_tablede, int choix_joueur, Joueur *joueur)
 {
-    int c; // va servir à vérifier si le joueur continue son tour ou pas
-    while (tablede)
+    int c, j = 0; // va servir à vérifier si le joueur continue son tour ou pas
+    for (int i = 0; i < MAXTABLE; i++)
     {
-        if (choix_joueur == *tablede)
+        if (choix_joueur == joueur->table_joueur[i])
         {
-            while (joueur->table_joueur)
-            {
-                if (choix_joueur == joueur->table_joueur)
-                {
-                    c = -1;
-                    break;
-                }
-                else
-                {
-                    joueur->table_joueur = &joueur->table_joueur + 1;
-                    c = 0;
-                }
-            }
-        } // A revoir
+            c = -1;
+            return c; // on sort de la fonction si le joueur comporte déjà la valeur qu'il a choisi sur la table
+        }
+        else
+        {
+            c = 1;
+        }
     }
+
+    for (int i = 0; i < taille_tablede; i++)
+    {
+        if (choix_joueur == tablede[i])
+        {
+            while (joueur->table_joueur[j] != 0)
+            {
+                j++;
+            }
+            joueur->table_joueur[j] = choix_joueur;
+            c = 1;
+        }
+        else
+        {
+            c = -1;
+        }
+    }
+
+    return c; // c vaudra -1 si el choix du joueur ne figure pas dans la table de dé proposée. Il passera alors son tour
 }
 
 Liste *init()
@@ -196,6 +205,87 @@ void affichepicko(Liste *pickos)
         printf(" __ ");
         e = e->suivant;
     } while (e != pickos->premier);
+}
+
+void menu()
+{
+    printf("************************\n");
+    printf("*       PICKOMINO      *\n");
+    printf("************************\n\n");
+    printf("1. Jouer contre IA\n");
+    printf("2. Jouer en multijoueur\n");
+    printf("3. Sortir\n");
+}
+
+Joueur *initJoueur(Joueur *joueur, char *nom)
+{
+    joueur->nom = nom;
+    joueur->score = 0;
+    for (int i = 0; i < MAXTABLE; i++)
+    {
+        joueur->table_joueur[i] = 0;
+    }
+
+    joueur->pickominos = NULL;
+    return joueur;
+}
+
+void deroulement_jeu(int choix_menu, Liste *pickos)
+{
+    switch (choix_menu)
+    {
+    case 1:
+        char *nom;
+        int nbre_de_joueurs = 2, tour = 0, *tablede = NULL, nbrede = 8, choix_joueur, verif = 0, j = 0;
+        printf("Entrez le nom du joueur: ");
+        scanf("%s", &nom);
+        Joueur *joueur = initJoueur(joueur, nom);
+        tour = quiCommence(nbre_de_joueurs);
+        while (pickos->premier != NULL)
+        {
+            if (tour == 1)
+            {
+                printf("\nAu tour de %s de jouer\n", joueur->nom);
+                while (nbrede > 0)
+                {
+                    printf("Appuyez sur ENTRER pour lancer les dés\n");
+                    getchar();
+                    tablede = lancede(nbrede);
+                    printf("Quel numéro gardez-vous ? (V -> numéro 6): ");
+                    scanf("%d", choix_joueur);
+                    verif = majTableJoueur(tablede, nbrede, choix_joueur, joueur);
+                    if (verif == -1)
+                    {
+                        printf("Vous avez choisi une valeur de dé que vous avez déjà ou qui n'existe pas. Votre tour s'arrête.\n Veuillez appuyer sur ENTRER");
+                        getchar();
+                        tour++;
+                    }
+                    else
+                    {
+                        j = 0;
+                        while (joueur->table_joueur[j] != 0)
+                        {
+                            j++;
+                        }
+                        nbrede -= j + 1;
+                    }
+                    free(tablede);
+                }
+            }
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+
+int quiCommence(int nbre_de_joueurs)
+{ // on tire aléatoirement un nombre entre 1 et le nombre de joueurs, les joueurs ayant chacun choisi un nombre. Celui qui a le nombre est tiré au sort commence
+    int n = 0;
+    srand(time(NULL));
+    n = rand() % nbre_de_joueurs + 1;
+    return n;
 }
 
 int choix_joueur(void)
