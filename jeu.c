@@ -336,3 +336,84 @@ void retirer_picko(Liste *plateau)
     }
     printf("NULL\n");
 }*/
+
+
+void sauv_score (int score1 ,int score2 ){/*cette fonction permet d'ecrire les scores dans un fichier en mettant en maj la premier lettre*/
+
+
+
+
+    char nom1[10]  ; /*cest 2 tableaux doivent etre remplacés par le nom des joueur*/
+    char nom2[10]  ; 
+    scanf("%s", nom1 );
+    scanf("%s", nom2 );
+    nom1[0] = toupper(nom1[0]);/* Condition de Rick metre les premieres lettres en maj pour faciliter la recherche*/
+    nom2[0] = toupper(nom2[0]);
+     
+    FILE* fichier = NULL ; /*creation d'un descripteur de fichier qui servira de passerelle pour manipuler le fichier*/
+    
+    
+    fichier = fopen("sauv_scores.txt", "a+"); /*ouverture du fichier en ecriture à la fin du fichier grace au descripteur*/
+    /*le fichier sera créé s'il n'existe pas*/
+    int mode ;/*permettra d'appeler la fonction mode() pour savoir si c'est vs IA ou Player*/ 
+    mode = 2 ;
+    if (fichier != NULL){  /* verification de l'ouverture du fichier*/
+        switch (mode)
+        {
+        case 1: /*edcriture du score dans le fichier pour le cas joueur vs IA */
+             
+            fprintf(fichier, "%s : %d  - ",nom1, score1);
+            fprintf(fichier, " IA : %d \n",score2);
+            break;
+        case 2: /*edcriture du score dans le fichier pour le cas joueur vs joueur */
+            fprintf(fichier, "%s : %d  - ",nom1, score1);
+            fprintf(fichier, " %s : %d \n", nom2,score2);
+            break;
+        default:
+            break;
+        }
+
+    }else{ /*en cas de non ouverture du fichier*/
+        printf("ERREUR! lors de l'ouverture"); 
+    }
+    fclose(fichier);
+}
+
+
+/*void lire_score(void){
+        char ligne[NBRELETTREMAX] = ""; 
+    FILE* fichier = NULL ; 
+    fichier = fopen("sauv.txt", "r"); 
+    if (fichier != NULL){
+        fseek(fichier ,0 , SEEK_SET);
+        printf("SCORE: \n"); 
+        fgets(ligne , NBRELETTREMAX , fichier); 
+        printf("%s\n", ligne); 
+    }else{
+        printf("ERROR! lors de las sauvegarde"); 
+    }
+    fclose(fichier);
+}*/ /*pareil que l'ecriture juste qu'ici on lit duex lignes du fichier vu que la partie sera entre 2 personnes*/
+
+
+void lire_score_joueur(void){/*cette fonction permet de lire le score d'un joueur dans le fichier*/
+
+
+    char ligne[NBRELETTREMAX] = ""; /*chaine de charactere qui va contenir le score lu dans le fichier*/
+    FILE* fichier = NULL ; /*descripteur de fichier*/
+    char* ret ; /*variable qui va servir à trouver l'occurence du nom qu'on cherche dans le fichier*/
+    fichier = fopen("sauv_scores.txt", "r"); 
+    if (fichier != NULL){
+        printf("fichier ouvert , vous pouvez work wit\n");
+        do{ 
+            ret = strstr(ligne, "nom1");/*strstr permet de chercher "nom1" dans la chaine de caractere qui a été lu */
+            printf("%s", ret);
+        }while(fgets(ligne , 10, fichier) != NULL && ret == NULL);/*parcours du fichieret lecture de chaque ligne */
+        printf("%s",ligne);
+        fgets(ligne , 10, fichier);
+        printf("%s",ligne);
+    }else{
+        printf("ERROR! lors de las sauvegarde"); 
+    }
+    fclose(fichier);
+}
