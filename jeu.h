@@ -25,12 +25,12 @@ struct Liste
 
 struct Pile
 {
-    Element *dernier;
+    Element *premier;
 };
 
 struct Joueur
 {
-    char *nom;
+    char nom[15];
     Pile *pickominos;
     int table_joueur[8];
     int score;
@@ -38,9 +38,9 @@ struct Joueur
 
 Liste *init();
 void affichepicko(Liste *);
-int *lancede(int);
+int *lancede(int, int *);
 int majTableJoueur(int *, int, int, Joueur *);
 void menu();
 Joueur *initJoueur(Joueur *, char *);
-void sauv_score(int score1 , int score2) ;
-void lire_score_joueur(void) ;
+int quiCommence(int);
+void viderBuffer();

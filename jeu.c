@@ -15,13 +15,11 @@
     return tirage;
 }*/
 
-int *lancede(int nombrede)
+int *lancede(int nombrede, int *tablede)
 {
     /*nombrede est le nombre de dé qu'il lui reste à lancer*/
     srand(time(NULL));
     int i, tirage;
-    int *tablede;
-    tablede = malloc(nombrede * sizeof(int));
     for (i = 0; i < nombrede; i++)
     {
         tirage = rand() % MAXDE + MINDE;
@@ -41,7 +39,7 @@ int *lancede(int nombrede)
 
 int majTableJoueur(int *tablede, int taille_tablede, int choix_joueur, Joueur *joueur)
 {
-    int c, j = 0; // va servir à vérifier si le joueur continue son tour ou pas
+    int c = 1, j = MAXTABLE - taille_tablede; // c va servir à vérifier si le joueur continue son tour ou pas
     for (int i = 0; i < MAXTABLE; i++)
     {
         if (choix_joueur == joueur->table_joueur[i])
@@ -49,27 +47,22 @@ int majTableJoueur(int *tablede, int taille_tablede, int choix_joueur, Joueur *j
             c = -1;
             return c; // on sort de la fonction si le joueur comporte déjà la valeur qu'il a choisi sur la table
         }
-        else
-        {
-            c = 1;
-        }
     }
 
+    c = 1;
     for (int i = 0; i < taille_tablede; i++)
     {
         if (choix_joueur == tablede[i])
         {
-            while (joueur->table_joueur[j] != 0)
-            {
-                j++;
-            }
             joueur->table_joueur[j] = choix_joueur;
             c = 1;
+            j += 1;
         }
-        else
-        {
-            c = -1;
-        }
+    }
+
+    if (j == (MAXTABLE - taille_tablede))
+    {
+        c = -1;
     }
 
     return c; // c vaudra -1 si el choix du joueur ne figure pas dans la table de dé proposée. Il passera alors son tour
@@ -94,6 +87,7 @@ Liste *init()
     Element *trente_quatre = malloc(sizeof(*trente_quatre));
     Element *trente_cinq = malloc(sizeof(*trente_cinq));
     Element *trente_six = malloc(sizeof(*trente_six));
+    Element *sentinelle = malloc(sizeof(*sentinelle));
 
     if (picko == NULL || vingt_un == NULL)
     {
@@ -101,10 +95,14 @@ Liste *init()
     }
     picko->premier = vingt_un;
     picko->dernier = trente_six;
+    sentinelle->valeur = 0;
+    sentinelle->point = 0;
+    sentinelle->suivant = vingt_un;
+    sentinelle->precedent = trente_six;
     vingt_un->valeur = 21;
     vingt_un->point = 1;
     vingt_un->suivant = vingt_deux;
-    vingt_un->precedent = picko->dernier;
+    vingt_un->precedent = sentinelle;
     vingt_deux->valeur = 22;
     vingt_deux->point = 1;
     vingt_deux->suivant = vingt_trois;
@@ -163,7 +161,7 @@ Liste *init()
     trente_cinq->precedent = trente_quatre;
     trente_six->valeur = 36;
     trente_six->point = 4;
-    trente_six->suivant = picko->premier;
+    trente_six->suivant = sentinelle;
     trente_six->precedent = trente_cinq;
 
     return picko;
@@ -219,7 +217,7 @@ void menu()
 
 Joueur *initJoueur(Joueur *joueur, char *nom)
 {
-    joueur->nom = nom;
+    strcpy(joueur->nom, nom);
     joueur->score = 0;
     for (int i = 0; i < MAXTABLE; i++)
     {
@@ -232,15 +230,16 @@ Joueur *initJoueur(Joueur *joueur, char *nom)
 
 void deroulement_jeu(int choix_menu, Liste *pickos)
 {
+    char nom[15];
+    int nbre_de_joueurs = 2, tour = 0, *tablede = malloc(MAXTABLE * sizeof(int)), nbrede = 8, choix_joueur = 0, verif = 0, j = 0, i = 0, total_val = 0;
+    Joueur *joueur = malloc(sizeof(*joueur));
     switch (choix_menu)
     {
     case 1:
-        char *nom;
-        int nbre_de_joueurs = 2, tour = 0, *tablede = NULL, nbrede = 8, choix_joueur, verif = 0, j = 0;
         printf("Entrez le nom du joueur: ");
-        scanf("%s", &nom);
-        Joueur *joueur = initJoueur(joueur, nom);
-        tour = quiCommence(nbre_de_joueurs);
+        scanf("%s", nom);
+        joueur = initJoueur(joueur, nom);
+        tour = 1; // quiCommence(nbre_de_joueurs);
         while (pickos->premier != NULL)
         {
             if (tour == 1)
@@ -248,17 +247,27 @@ void deroulement_jeu(int choix_menu, Liste *pickos)
                 printf("\nAu tour de %s de jouer\n", joueur->nom);
                 while (nbrede > 0)
                 {
-                    printf("Appuyez sur ENTRER pour lancer les dés\n");
-                    getchar();
-                    tablede = lancede(nbrede);
-                    printf("Quel numéro gardez-vous ? (V -> numéro 6): ");
-                    scanf("%d", choix_joueur);
+                    printf("\nVotre table -> [ ");
+                    i = 0;
+                    while (joueur->table_joueur[i] != 0)
+                    {
+                        printf("%d ", joueur->table_joueur[i]);
+                        i++;
+                    }
+
+                    printf("]\n");
+                    printf("Appuyez sur ENTRER pour lancer les des\n");
+                    system("pause");
+                    tablede = lancede(nbrede, tablede);
+                    printf("\nQuel numero gardez-vous ? (V -> numero 6): ");
+                    scanf("%d", &choix_joueur);
                     verif = majTableJoueur(tablede, nbrede, choix_joueur, joueur);
                     if (verif == -1)
                     {
-                        printf("Vous avez choisi une valeur de dé que vous avez déjà ou qui n'existe pas. Votre tour s'arrête.\n Veuillez appuyer sur ENTRER");
+                        printf("\nVous avez choisi une valeur de de que vous avez deja ou qui n'existe pas. Votre tour s'arrete.\nVeuillez appuyer sur ENTRER");
                         getchar();
                         tour++;
+                        nbrede = 0;
                     }
                     else
                     {
@@ -267,17 +276,67 @@ void deroulement_jeu(int choix_menu, Liste *pickos)
                         {
                             j++;
                         }
-                        nbrede -= j + 1;
+
+                        nbrede = MAXTABLE - j;
+                        if (nbrede == 0)
+                        {
+                            j = 0;
+                            total_val = 0;
+                            while (j < 8)
+                            { // On prend le total de tous les lancés de dé
+                                total_val += joueur->table_joueur[j];
+                                j++;
+                            }
+
+                            if (pickos->premier->valeur == 0)
+                            {
+                                pickos->premier = pickos->premier->suivant;
+                            }
+
+                            verif = -1;
+                            while (pickos->premier->valeur != 0 || verif == 1)
+                            {
+                                if (total_val == pickos->premier->valeur)
+                                {
+                                    joueur->pickominos->premier = pickos->premier;
+                                    pickos->premier->precedent->suivant = pickos->premier->suivant;
+                                    pickos->premier->suivant->precedent = pickos->premier->precedent;
+                                    verif = 1;
+                                }
+                                else
+                                {
+                                    pickos->premier = pickos->premier->suivant;
+                                }
+                            }
+
+                            if (verif == -1)
+                            { // Verif vaut -1 si aucun pickomino n'a été alloué au joueur, sinon, il vaut 1
+                                printf("\nVotre total ne correspond à aucun pickomino.");
+                                tour++;
+                            }
+                            else
+                            {
+                                printf("\nVos pickos -> [ ");
+                                i = 0;
+                            }
+
+                            if (tour > 2)
+                            {
+                                tour = 1;
+                            }
+                        }
                     }
-                    free(tablede);
                 }
             }
         }
+        free(joueur);
         break;
 
     default:
         break;
     }
+
+    free(tablede);
 }
 
 int quiCommence(int nbre_de_joueurs)
@@ -286,16 +345,6 @@ int quiCommence(int nbre_de_joueurs)
     srand(time(NULL));
     n = rand() % nbre_de_joueurs + 1;
     return n;
-}
-
-int choix_joueur(void)
-{
-    int *reslancede;
-    int nbrede_de_restant;
-    nbrede_de_restant = 8;
-    reslancede = lancede(&nbrede_de_restant);
-
-    return (0);
 }
 
 void rendre_picko(Liste *plateau, Element *picko)
@@ -337,83 +386,11 @@ void retirer_picko(Liste *plateau)
     printf("NULL\n");
 }*/
 
-
-void sauv_score (int score1 ,int score2 ){/*cette fonction permet d'ecrire les scores dans un fichier en mettant en maj la premier lettre*/
-
-
-
-
-    char nom1[10]  ; /*cest 2 tableaux doivent etre remplacés par le nom des joueur*/
-    char nom2[10]  ; 
-    scanf("%s", nom1 );
-    scanf("%s", nom2 );
-    nom1[0] = toupper(nom1[0]);/* Condition de Rick metre les premieres lettres en maj pour faciliter la recherche*/
-    nom2[0] = toupper(nom2[0]);
-     
-    FILE* fichier = NULL ; /*creation d'un descripteur de fichier qui servira de passerelle pour manipuler le fichier*/
-    
-    
-    fichier = fopen("sauv_scores.txt", "a+"); /*ouverture du fichier en ecriture à la fin du fichier grace au descripteur*/
-    /*le fichier sera créé s'il n'existe pas*/
-    int mode ;/*permettra d'appeler la fonction mode() pour savoir si c'est vs IA ou Player*/ 
-    mode = 2 ;
-    if (fichier != NULL){  /* verification de l'ouverture du fichier*/
-        switch (mode)
-        {
-        case 1: /*edcriture du score dans le fichier pour le cas joueur vs IA */
-             
-            fprintf(fichier, "%s : %d  - ",nom1, score1);
-            fprintf(fichier, " IA : %d \n",score2);
-            break;
-        case 2: /*edcriture du score dans le fichier pour le cas joueur vs joueur */
-            fprintf(fichier, "%s : %d  - ",nom1, score1);
-            fprintf(fichier, " %s : %d \n", nom2,score2);
-            break;
-        default:
-            break;
-        }
-
-    }else{ /*en cas de non ouverture du fichier*/
-        printf("ERREUR! lors de l'ouverture"); 
+void viderBuffer()
+{
+    int c = 0;
+    while (c != '\n' && c != EOF)
+    {
+        c = getchar();
     }
-    fclose(fichier);
-}
-
-
-/*void lire_score(void){
-        char ligne[NBRELETTREMAX] = ""; 
-    FILE* fichier = NULL ; 
-    fichier = fopen("sauv.txt", "r"); 
-    if (fichier != NULL){
-        fseek(fichier ,0 , SEEK_SET);
-        printf("SCORE: \n"); 
-        fgets(ligne , NBRELETTREMAX , fichier); 
-        printf("%s\n", ligne); 
-    }else{
-        printf("ERROR! lors de las sauvegarde"); 
-    }
-    fclose(fichier);
-}*/ /*pareil que l'ecriture juste qu'ici on lit duex lignes du fichier vu que la partie sera entre 2 personnes*/
-
-
-void lire_score_joueur(void){/*cette fonction permet de lire le score d'un joueur dans le fichier*/
-
-
-    char ligne[NBRELETTREMAX] = ""; /*chaine de charactere qui va contenir le score lu dans le fichier*/
-    FILE* fichier = NULL ; /*descripteur de fichier*/
-    char* ret ; /*variable qui va servir à trouver l'occurence du nom qu'on cherche dans le fichier*/
-    fichier = fopen("sauv_scores.txt", "r"); 
-    if (fichier != NULL){
-        printf("fichier ouvert , vous pouvez work wit\n");
-        do{ 
-            ret = strstr(ligne, "nom1");/*strstr permet de chercher "nom1" dans la chaine de caractere qui a été lu */
-            printf("%s", ret);
-        }while(fgets(ligne , 10, fichier) != NULL && ret == NULL);/*parcours du fichieret lecture de chaque ligne */
-        printf("%s",ligne);
-        fgets(ligne , 10, fichier);
-        printf("%s",ligne);
-    }else{
-        printf("ERROR! lors de las sauvegarde"); 
-    }
-    fclose(fichier);
 }
