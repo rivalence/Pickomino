@@ -42,3 +42,5 @@ int *lancede(int);
 int majTableJoueur(int *, int, int, Joueur *);
 void menu();
 Joueur *initJoueur(Joueur *, char *);
+void sauv_score(int score1 , int score2) ;
+void lire_score_joueur(void) ;
