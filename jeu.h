@@ -39,8 +39,13 @@ struct Joueur
 Liste *init();
 void affichepicko(Liste *);
 int *lancede(int, int *);
-int majTableJoueur(int *, int, int, Joueur *);
+int majTableJoueur(int *, int, int, Joueur *, int);
 void menu();
-Joueur *initJoueur(Joueur *, char *);
+void initJoueur(Joueur *, Pile *);
 int quiCommence(int);
 void viderBuffer();
+void deroulementJeu(Liste *, Joueur *, int *, int, int);
+void exec(int, Liste *, int);
+int execJoueur(Joueur *, int, int, int *, int, Liste *);
+void reInitTable(Joueur *);
+int eligiblePicko(Joueur *);
