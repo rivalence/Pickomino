@@ -27,6 +27,10 @@ int main(void)
         }
         break;
 
+    case 3:
+        printf("Sortie du jeu...");
+        exit(EXIT_SUCCESS);
+        break;
     default:
         break;
     }

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <conio.h>
+#include <windows.h>
 #include "jeu.h"
 
 int *lancede(int nombrede, int *tablede)
@@ -287,9 +288,9 @@ void reInitPicko(Liste *pickos)
     pickos->premier = pickos->premier->suivant;
 }
 
-int execJoueur(Joueur *joueur, int tour, int nbrede, int *tablede, int nbre_de_joueurs, Liste *pickos)
+int execJoueur(Joueur *joueur, int tour, int *tablede, int nbre_de_joueurs, Liste *pickos)
 {
-    int choix_joueur = 0, verif = 0, total_val = 0, i = 0, j = 0, compt = 0, accepteLance = 1, vers = 0, choix_picko = 0;
+    int choix_joueur = 0, verif = 0, total_val = 0, i = 0, j = 0, compt = 0, accepteLance = 1, vers = 0, choix_picko = 0, nbrede = 8;
     char validLance;
 
     reInitPicko(pickos);
@@ -297,7 +298,8 @@ int execJoueur(Joueur *joueur, int tour, int nbrede, int *tablede, int nbre_de_j
     printf("\n\nAu tour de %s de jouer\n", joueur[tour - 1].nom);
     while (nbrede > 0)
     {
-        printf("\nVotre table -> [ ");
+        affichePickosVisibles(joueur, nbre_de_joueurs);
+        printf("\n\nVotre table -> [ ");
         i = 0;
         while (joueur[tour - 1].table_joueur[i] != 0)
         {
@@ -314,6 +316,8 @@ int execJoueur(Joueur *joueur, int tour, int nbrede, int *tablede, int nbre_de_j
         }
 
         printf("]\n");
+        affichepicko(pickos);
+        printf("\n");
         if (compt == 0)
         {
             verif = majTableJoueur(tablede, nbrede, choix_joueur, &joueur[tour - 1], nbrede);
@@ -408,7 +412,6 @@ int execJoueur(Joueur *joueur, int tour, int nbrede, int *tablede, int nbre_de_j
                     }
                     else
                     {
-                        affichePickosVisibles(joueur, nbre_de_joueurs);
                         tour++;
                         nbrede = 0;
                     }
@@ -423,6 +426,218 @@ int execJoueur(Joueur *joueur, int tour, int nbrede, int *tablede, int nbre_de_j
     }
 
     return tour;
+}
+
+int execIA(Liste *pickos, Joueur *joueur, int tour, int nbre_de_joueurs, int *tablede)
+{
+    int nbrede = 8, i = 0, verif = 0, j = 0, total_val = 0, vers = 0, tab_inter[MAXTABLE];
+    reInitPicko(pickos);
+    affichepicko(pickos);
+    printf("\n\nAu tour de %s de jouer\n", joueur[tour - 1].nom);
+    while (nbrede > 0)
+    {
+        affichePickosVisibles(joueur, nbre_de_joueurs);
+        printf("\n\nVotre table -> [ ");
+        i = 0;
+        while (joueur[tour - 1].table_joueur[i] != 0)
+        {
+            if (joueur[tour - 1].table_joueur[i] == 6)
+            {
+                printf("V ");
+                i++;
+            }
+            else
+            {
+                printf("%d ", joueur[tour - 1].table_joueur[i]);
+                i++;
+            }
+        }
+
+        printf("]\n");
+        reInitPicko(pickos);
+        affichepicko(pickos);
+        printf("\n");
+        verif = majTableIA(tablede, nbrede, &joueur[tour - 1]);
+        Sleep(1500);
+        if (verif != 1)
+        {
+            printf("\n%s passe son tour.\nRestitution de son pickomino visible en cours...\n", joueur[tour - 1].nom);
+            reInitTable(&joueur[tour - 1]);
+            rendrePicko(pickos, &joueur[tour - 1]);
+            nbrede = 0;
+            tour++;
+        }
+        else
+        {
+            j = 0;
+            while (joueur[tour - 1].table_joueur[j] != 0)
+            {
+                j++;
+            }
+
+            nbrede = MAXTABLE - j;
+            j = 0;
+            total_val = 0;
+            while (j < 8)
+            { // On prend le total de tous les lancés de dé
+                if (joueur[tour - 1].table_joueur[j] == 6)
+                {
+                    tab_inter[j] = 5;
+                }
+                else
+                {
+                    tab_inter[j] = joueur[tour - 1].table_joueur[j];
+                }
+                total_val += tab_inter[j]; // on rajoute à total_val la somme de ses lancés de dé
+                j++;
+            }
+
+            reInitPicko(pickos);
+            if ((total_val < pickos->dernier->valeur && total_val > pickos->premier->valeur)) // On arrête de lancer les dés de l'IA quand son total rentre dans la zone des pickominos
+            {
+                // diff = pickos->dernier->valeur - total_val;
+                // if (diff < (nbrede * 5))
+                //{
+                vers = eligiblePicko(&joueur[tour - 1]); // Si sur sa table l'IA n'a pas de vers, on passe son tour
+                if (vers == 0)
+                {
+                    printf("\n%s passe son tour.\nRestitution de son pickomino visible en cours...\n", joueur[tour - 1].nom);
+                    rendrePicko(pickos, &joueur[tour - 1]);
+                    nbrede = 0;
+                    reInitTable(&joueur[tour - 1]);
+                    tour++;
+                }
+                else
+                {
+                    verif = -1;
+                    if (total_val == joueur[tour - 2].pickominos->elt->valeur)
+                    {
+                        verif = majPileJoueur(total_val, total_val, tour, joueur, verif, pickos, nbre_de_joueurs); // L'IA empile le pickomino visible de l'adversaire
+                        reInitTable(&joueur[tour - 1]);
+                    }
+                    else
+                    {
+                        reInitPicko(pickos);
+                        while (total_val > pickos->premier->valeur && pickos->premier->valeur != 0)
+                        { // On cherche si le total de l'IA correspond à un pickomino, sinon, à la valeur inférieur la plus proche
+                            pickos->premier = pickos->premier->suivant;
+                        }
+
+                        if (total_val == pickos->premier->valeur)
+                        { // On prend le pickomino correspondant
+                            verif = majPileJoueur(total_val, total_val, tour, joueur, verif, pickos, nbre_de_joueurs);
+                        }
+                        else if (total_val < pickos->premier->valeur)
+                        { // On prend le pickomino de valeur inférieure
+                            total_val = pickos->premier->precedent->valeur;
+                            verif = majPileJoueur(total_val, total_val, tour, joueur, verif, pickos, nbre_de_joueurs);
+                        }
+
+                        reInitTable(&joueur[tour - 1]);
+                    }
+
+                    if (verif != 1)
+                    {
+                        printf("\n%s passe son tour.\nRestitution de son pickomino visible en cours...\n", joueur[tour - 1].nom);
+                        rendrePicko(pickos, &joueur[tour - 1]);
+                        nbrede = 0;
+                        reInitTable(&joueur[tour - 1]);
+                        tour++;
+                    }
+
+                    nbrede = 0;
+                    tour++;
+                }
+                //}
+            }
+        }
+    }
+
+    if (tour > nbre_de_joueurs)
+    {
+        tour = 1;
+    }
+
+    return tour;
+}
+
+int majTableIA(int *tablede, int nbrede, Joueur *joueur)
+{
+    int index_max = 0, j = 0, i = 0, taille_tab_ia = 0;
+    tablede = lancede(nbrede, tablede);
+    while (joueur->table_joueur[j] != 0)
+    { // On prend le nombre d'éléments de la table de l'IA
+        taille_tab_ia++;
+        j++;
+    }
+
+    if (taille_tab_ia > 0)
+    {
+        do
+        {
+            while (i < nbrede)
+            { // On prend le max des valeurs obtenues dans le lancé en s'assurant qu'elle n'existe pas dans la table de l'IA
+                if (tablede[index_max] < tablede[i])
+                {
+                    index_max = i;
+                    i++;
+                }
+                else
+                {
+                    i++;
+                }
+            }
+
+            j = 0;
+            while (joueur->table_joueur[j] != 0 && i != 0 && j < 8)
+            {
+                if (joueur->table_joueur[j] == tablede[index_max])
+                { // si la valeur max est déjà dans la table de l'IA, on lui affecte la valeur 0 et on re-cherche le max
+                    tablede[index_max] = 0;
+                    index_max = 0;
+                    i = 0;
+                }
+                else
+                {
+                    j++;
+                }
+            }
+        } while (i == 0);
+    }
+    else
+    {
+        i = 0;
+        while (i < nbrede)
+        { // La table IA est vide, on prend simplement le max des dés
+            if (tablede[index_max] < tablede[i])
+            {
+                index_max = i;
+                i++;
+            }
+            else
+            {
+                i++;
+            }
+        }
+    }
+
+    if (tablede[index_max] != 0)
+    { // on a bien un max qui est eligible et qu'on peut remplir dans la table IA
+        for (i = 0; i < nbrede; i++)
+        {
+            if (tablede[index_max] == tablede[i])
+            {
+                joueur->table_joueur[taille_tab_ia] = tablede[index_max];
+                taille_tab_ia++;
+            }
+        }
+        printf("\n");
+        return 1;
+    }
+    else
+    {
+        return -1;
+    }
 }
 
 void affichePickosVisibles(Joueur *joueur, int nbre_de_joueurs)
@@ -560,34 +775,47 @@ int verifInferieurProche(Liste *pickos, int choix_picko, int total_val)
 
 void deroulementJeu(Liste *pickos, Joueur *joueur, int *tablede, int nbre_de_joueurs, int choix_menu)
 {
-    int tour = 0, nbrede = 8, tailleListe = 5, max = 0, index = 0;
+    int tour = 0, tailleListe = 5, max = 0, index = 0;
     Pile *pickominos = malloc(nbre_de_joueurs * sizeof(*pickominos));
-
-    for (int i = 0; i < nbre_de_joueurs; i++) // initialisation des données de chaque joueur
-    {
-        initJoueur(&joueur[i], &pickominos[i]);
-        printf("Entrez le nom du joueur %d: ", i + 1);
-        scanf("%s", joueur[i].nom);
-    }
 
     tour = quiCommence(nbre_de_joueurs);
 
     if (nbre_de_joueurs == 2 && choix_menu == 1) // Si IA
     {
+        for (int i = 0; i < nbre_de_joueurs; i++) // initialisation des données de chaque joueur
+        {
+            initJoueur(&joueur[i], &pickominos[i]);
+        }
+        printf("Entrez le nom du joueur :");
+        scanf("%s", joueur[0].nom);
+        strcpy(joueur[1].nom, "IA");
+
         while (tailleListe != 1)
         {
             if (tour == 1)
             {
-                tour = execJoueur(joueur, tour, nbrede, tablede, nbre_de_joueurs, pickos);
+                tour = execJoueur(joueur, tour, tablede, nbre_de_joueurs, pickos);
+                tailleListe = comptElt(pickos);
+            }
+            else
+            {
+                tour = execIA(pickos, joueur, tour, nbre_de_joueurs, tablede);
                 tailleListe = comptElt(pickos);
             }
         }
     }
     else
     {
+        for (int i = 0; i < nbre_de_joueurs; i++) // initialisation des données de chaque joueur
+        {
+            initJoueur(&joueur[i], &pickominos[i]);
+            printf("Entrez le nom du joueur %d: ", i + 1);
+            scanf("%s", joueur[i].nom);
+        }
+
         while (tailleListe != 1)
         {
-            tour = execJoueur(joueur, tour, nbrede, tablede, nbre_de_joueurs, pickos);
+            tour = execJoueur(joueur, tour, tablede, nbre_de_joueurs, pickos);
             tailleListe = comptElt(pickos);
         }
     }
@@ -676,6 +904,7 @@ int comptElt(Liste *pickos)
 
     return compt;
 }
+
 void viderBuffer()
 {
     int c = 0;
