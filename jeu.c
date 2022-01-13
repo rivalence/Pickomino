@@ -16,11 +16,11 @@ int *lancede(int nombrede, int *tablede)
         tablede[i] = tirage;
         if (tirage == 6)
         {
-            printf("de%d = V ", i);
+            printf("[V] ");
         }
         else
         {
-            printf("de%d = %d ", i, tirage);
+            printf("[%d] ", tirage);
         }
     }
 
@@ -167,6 +167,11 @@ void affichepicko(Liste *pickos)
     Element *e = pickos->premier;
     do
     {
+        if (e->valeur == 0)
+        {
+            e = e->suivant;
+            continue;
+        }
         printf(" __ ");
         e = e->suivant;
     } while (e != pickos->premier);
@@ -174,6 +179,11 @@ void affichepicko(Liste *pickos)
     printf("\n");
     do
     {
+        if (e->valeur == 0)
+        {
+            e = e->suivant;
+            continue;
+        }
         printf("|%d|", e->valeur);
         e = e->suivant;
     } while (e != pickos->premier);
@@ -181,6 +191,11 @@ void affichepicko(Liste *pickos)
     printf("\n");
     do
     {
+        if (e->valeur == 0)
+        {
+            e = e->suivant;
+            continue;
+        }
         printf(" __ ");
         e = e->suivant;
     } while (e != pickos->premier);
@@ -188,6 +203,11 @@ void affichepicko(Liste *pickos)
     printf("\n");
     do
     {
+        if (e->valeur == 0)
+        {
+            e = e->suivant;
+            continue;
+        }
         printf("|%.2d|", e->point);
         e = e->suivant;
     } while (e != pickos->premier);
@@ -195,6 +215,11 @@ void affichepicko(Liste *pickos)
     printf("\n");
     do
     {
+        if (e->valeur == 0)
+        {
+            e = e->suivant;
+            continue;
+        }
         printf(" __ ");
         e = e->suivant;
     } while (e != pickos->premier);
@@ -219,10 +244,10 @@ void initJoueur(Joueur *joueur, Pile *pickominos)
     }
 
     joueur->pickominos = pickominos;
-    joueur->pickominos->premier->valeur = 0;
-    joueur->pickominos->premier->point = 0;
-    joueur->pickominos->premier->precedent = NULL;
-    joueur->pickominos->premier->suivant = NULL;
+    joueur->pickominos->elt->valeur = 0;
+    joueur->pickominos->elt->point = 0;
+    joueur->pickominos->elt->precedent = NULL;
+    joueur->pickominos->elt->suivant = NULL;
 }
 
 void reInitTable(Joueur *joueur)
@@ -252,11 +277,22 @@ int eligiblePicko(Joueur *joueur)
     return v;
 }
 
+void reInitPicko(Liste *pickos)
+{
+    while (pickos->premier->valeur != 0) // On se positionne sur le premier élément de la liste des pickos
+    {
+        pickos->premier = pickos->premier->suivant;
+    }
+
+    pickos->premier = pickos->premier->suivant;
+}
+
 int execJoueur(Joueur *joueur, int tour, int nbrede, int *tablede, int nbre_de_joueurs, Liste *pickos)
 {
-    int choix_joueur = 0, verif = 0, total_val = 0, i = 0, j = 0, compt = 0, accepteLance = 1, vers = 0;
+    int choix_joueur = 0, verif = 0, total_val = 0, i = 0, j = 0, compt = 0, accepteLance = 1, vers = 0, choix_picko = 0;
     char validLance;
 
+    reInitPicko(pickos);
     affichepicko(pickos);
     printf("\n\nAu tour de %s de jouer\n", joueur[tour - 1].nom);
     while (nbrede > 0)
@@ -286,31 +322,31 @@ int execJoueur(Joueur *joueur, int tour, int nbrede, int *tablede, int nbre_de_j
         else
         {
             printf("\nVoulez-vous relancer vos des ?: [O/N] :");
-            scanf("%c", &validLance);
-            while (validLance != "O" && validLance != "o" && validLance != "n" && validLance != "N")
+            validLance = getchar();
+            while (validLance != 'O' && validLance != 'o' && validLance != 'n' && validLance != 'N')
             { // test de validité de l'entrée du joueur
                 printf("Repondez par O (oui) ou N (non): ");
-                scanf("%c", &validLance);
+                validLance = getchar();
             }
 
-            if (validLance == "o" || validLance == "O")
+            if (validLance == 'o' || validLance == 'O')
             {
                 verif = majTableJoueur(tablede, nbrede, choix_joueur, &joueur[tour - 1], nbrede);
             }
             else
             { // si le joueur entre N (pour ne plus lancer de dé), accepteLance vaut 1 et on compte le total de sa table.
                 nbrede = 0;
-                accepteLance = 1;
+                accepteLance = 0;
             }
         }
 
         if (verif == -1) // Mauvais choix du joueur, on passe son tour
         {
-            printf("\nVous avez choisi une valeur de de que vous avez deja ou qui n'existe pas. Votre tour s'arrete.\nVeuillez appuyer sur ENTRER");
-            getchar();
-            tour++;
+            printf("\nVous avez choisi une valeur de de que vous avez deja ou qui n'existe pas. Votre tour s'arrete.\nRestitution de votre picnkomino visible en cours...\n");
+            rendrePicko(pickos, &joueur[tour - 1]);
             nbrede = 0;
             reInitTable(&joueur[tour - 1]); // On remet la table du joueur à 0
+            tour++;
         }
         else
         {
@@ -321,13 +357,15 @@ int execJoueur(Joueur *joueur, int tour, int nbrede, int *tablede, int nbre_de_j
             }
 
             nbrede = MAXTABLE - j;
-            if (nbrede == 0 || accepteLance == 1)
+            if (nbrede == 0 || accepteLance == 0)
             {
                 vers = eligiblePicko(&joueur[tour - 1]);
                 if (vers == 0)
                 {
-                    printf("\nVous ne comportez aucun vers dans votre table. Vous ne pouvez donc prendre aucun pickomino de la brochette.\nRestitution de votre pickomino visible...");
-                    // appeler rendrePicko()
+                    printf("\nVous ne comportez aucun vers dans votre table. Vous ne pouvez donc prendre aucun pickomino de la brochette.\nRestitution de votre pickomino visible...\n");
+                    rendrePicko(pickos, &joueur[tour - 1]);
+                    reInitTable(&joueur[tour - 1]); // On remet la table du joueur à 0
+                    nbrede = 0;
                     tour++;
                 }
                 else
@@ -344,55 +382,35 @@ int execJoueur(Joueur *joueur, int tour, int nbrede, int *tablede, int nbre_de_j
                         j++;
                     }
 
-                    while (pickos->premier->valeur != 0) // On se positionne sur le premier élément de la liste des pickos
-                    {
-                        pickos->premier = pickos->premier->suivant;
-                    }
-
-                    pickos->premier = pickos->premier->suivant;
-                    printf("\nPickominos visibles: \n"); // affichage du pickomino visible de chaque joueur
-                    for (i = 0; i < nbre_de_joueurs; i++)
-                    {
-                        printf("%s -> [ %d ]\n", joueur[i].nom, joueur[i].pickominos->premier->valeur);
-                    }
-
+                    affichePickosVisibles(joueur, nbre_de_joueurs);
+                    reInitPicko(pickos);
                     affichepicko(pickos);
                     printf("\nVOTRE TOTAL SUR LES LANCES -> %d", total_val);
                     if (total_val < 21 || total_val > 36)
                     { // Si le total est éligible ou pas au choix d'un pickomino
-                        verif = 1;
+                        verif = 0;
                     }
                     else
                     {
                         verif = -1;
                     }
-                    /*CHERCHER LES PICKOMINOS VISIBLES ET PROPOSER AU JOUEUR CE QU'IL PEUT OBTENIR.
-                    LE CAS ECHEANT, PASSER SON TOUR*/
 
-                    while (pickos->premier->valeur != 0 && verif == -1) // Fin des lancés de dés, on parcoure les pickominos et on vérifie si lee total du joueur fait qu'il en bénéficie d'un.
-                    {
-                        if (total_val == pickos->premier->valeur)
-                        {
-                            joueur[tour - 1].pickominos->premier = pickos->premier;
-                            pickos->premier->precedent->suivant = pickos->premier->suivant;
-                            pickos->premier->suivant->precedent = pickos->premier->precedent;
-                            verif = 1; // Notre booléen prend la valeur un si un pickomino est attribué avec succès à un jour
-                        }
-                        else
-                        {
-                            pickos->premier = pickos->premier->suivant;
-                        }
-                    }
-
-                    reInitTable(&joueur[tour - 1]); // On remet la table du joueur à 0
-                    if (verif == -1)
+                    printf("\nQuel pickomino souhaitez-vous prendre %s? :", joueur[tour - 1].nom);
+                    scanf("%d", &choix_picko);
+                    verif = majPileJoueur(total_val, choix_picko, tour, joueur, verif, pickos, nbre_de_joueurs); // On met à jour la pile du joueur (empile ou desempile)
+                    reInitTable(&joueur[tour - 1]);                                                              // On remet la table du joueur à 0
+                    if (verif == 0)
                     { // Verif vaut -1 si aucun pickomino n'a été alloué au joueur, sinon, il vaut 1
-                        printf("\nVotre total ne correspond à aucun pickomino.");
+                        printf("\nVotre choix ne correspond à aucun pickomino eligible.\nRestitution de votre pickomino visible en cours...\n");
+                        rendrePicko(pickos, &joueur[tour - 1]);
                         tour++;
+                        nbrede = 0;
                     }
                     else
                     {
+                        affichePickosVisibles(joueur, nbre_de_joueurs);
                         tour++;
+                        nbrede = 0;
                     }
                 }
             }
@@ -407,9 +425,142 @@ int execJoueur(Joueur *joueur, int tour, int nbrede, int *tablede, int nbre_de_j
     return tour;
 }
 
+void affichePickosVisibles(Joueur *joueur, int nbre_de_joueurs)
+{
+    printf("\nPickominos visibles: \n"); // affichage du pickomino visible de chaque joueur
+    for (int i = 0; i < nbre_de_joueurs; i++)
+    {
+        if (joueur[i].pickominos->elt->valeur == 0)
+        {
+            printf("%s -> [ ]\n", joueur[i].nom);
+        }
+        else
+        {
+            printf("%s -> [ %d ]\n", joueur[i].nom, joueur[i].pickominos->elt->valeur);
+        }
+    }
+}
+
+int majPileJoueur(int total_val, int choix_picko, int tour, Joueur *joueur, int verif, Liste *pickos, int nbre_de_joueurs)
+{
+    int nbre_element_liste = 0;
+    reInitPicko(pickos);
+    if (verif == 0)
+    { // le total des dés est une valeur erronée, on renvoie un booléan FALSE
+        return verif;
+    }
+
+    nbre_element_liste = comptElt(pickos);
+    while (pickos->premier->valeur != 0 && verif != 1) // Fin des lancés de dés, on parcoure les pickominos et on vérifie si lee total du joueur fait qu'il en bénéficie d'un.
+    {
+        if (choix_picko == pickos->premier->valeur && choix_picko == total_val)
+        {
+            if (nbre_element_liste == 2)
+            {
+                joueur[tour - 1].pickominos->elt->suivant = pickos->premier;
+                pickos->premier->precedent->suivant = NULL;
+                pickos->premier->precedent->precedent = NULL;
+                pickos->premier = pickos->premier->precedent;
+                joueur[tour - 1].pickominos->elt->suivant->precedent = joueur[tour - 1].pickominos->elt;
+                joueur[tour - 1].pickominos->elt->suivant->suivant = NULL;
+                joueur[tour - 1].pickominos->elt = joueur[tour - 1].pickominos->elt->suivant;
+            }
+            else
+            {
+                joueur[tour - 1].pickominos->elt->suivant = pickos->premier;
+                pickos->premier->precedent->suivant = pickos->premier->suivant;
+                pickos->premier->suivant->precedent = pickos->premier->precedent;
+                pickos->premier = pickos->premier->suivant;
+                joueur[tour - 1].pickominos->elt->suivant->precedent = joueur[tour - 1].pickominos->elt;
+                joueur[tour - 1].pickominos->elt->suivant->suivant = NULL;
+                joueur[tour - 1].pickominos->elt = joueur[tour - 1].pickominos->elt->suivant;
+            }
+
+            verif = 1; // Notre booléen prend la valeur un si un pickomino est attribué avec succès à un jour
+        }
+        else
+        {
+            pickos->premier = pickos->premier->suivant;
+        }
+    }
+
+    if (verif != 1)
+    { // Si le choix du picko voulu n'est plus sur la brochette, on vérifie d'abord s'il est visible sur la pile d'un joueur
+        for (int i = 0; i < nbre_de_joueurs; i++)
+        {
+            if (i == tour - 1)
+            {
+                continue;
+            }
+            else
+            {
+                if (choix_picko == joueur[i].pickominos->elt->valeur)
+                { // Le joueur actuel prend le pickomino visible d'un autre joueur
+                    joueur[tour - 1].pickominos->elt->suivant = joueur[i].pickominos->elt;
+                    joueur[i].pickominos->elt = joueur[i].pickominos->elt->precedent;
+                    joueur[i].pickominos->elt->suivant = NULL;
+                    joueur[tour - 1].pickominos->elt->suivant->precedent = joueur[tour - 1].pickominos->elt;
+                    joueur[tour - 1].pickominos->elt = joueur[tour - 1].pickominos->elt->suivant;
+                    joueur[tour - 1].pickominos->elt->suivant = NULL;
+                    verif = 1;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (verif != 1)
+    {
+        reInitPicko(pickos);
+        verif = verifInferieurProche(pickos, choix_picko, total_val); // On vérifie si le joueur a bien choisi la valeur inférieure la plus proche à celle qu'il devait avoir
+
+        if (verif == 1)
+        {
+            total_val = choix_picko;
+            verif = -1;
+            verif = majPileJoueur(total_val, choix_picko, tour, joueur, verif, pickos, nbre_de_joueurs);
+        }
+    }
+
+    return verif;
+}
+
+int verifInferieurProche(Liste *pickos, int choix_picko, int total_val)
+{ // on vérifie si le choix du joueur est vraiment la valeur inférieure proche, sinon il passera son tour et perdra un pickomino
+    int egal = 0;
+    while (pickos->premier->valeur != choix_picko)
+    {
+        if (pickos->premier->valeur == 0)
+        {
+            break;
+        }
+
+        pickos->premier = pickos->premier->suivant;
+    }
+
+    if (pickos->premier->valeur == choix_picko)
+    {
+        egal = 1;
+    }
+
+    if (egal == 1)
+    {
+        if (pickos->premier->suivant->valeur > total_val)
+        {
+            egal = 1;
+        }
+        else
+        {
+            egal = 0;
+        }
+    }
+
+    return egal;
+}
+
 void deroulementJeu(Liste *pickos, Joueur *joueur, int *tablede, int nbre_de_joueurs, int choix_menu)
 {
-    int tour = 0, nbrede = 8;
+    int tour = 0, nbrede = 8, tailleListe = 5, max = 0, index = 0;
     Pile *pickominos = malloc(nbre_de_joueurs * sizeof(*pickominos));
 
     for (int i = 0; i < nbre_de_joueurs; i++) // initialisation des données de chaque joueur
@@ -421,23 +572,38 @@ void deroulementJeu(Liste *pickos, Joueur *joueur, int *tablede, int nbre_de_jou
 
     tour = quiCommence(nbre_de_joueurs);
 
-    if (nbre_de_joueurs == 2 && choix_menu == 1)
+    if (nbre_de_joueurs == 2 && choix_menu == 1) // Si IA
     {
-        while (pickos->premier != NULL)
+        while (tailleListe != 1)
         {
             if (tour == 1)
             {
                 tour = execJoueur(joueur, tour, nbrede, tablede, nbre_de_joueurs, pickos);
+                tailleListe = comptElt(pickos);
             }
         }
     }
     else
     {
-        while (pickos->premier != NULL)
+        while (tailleListe != 1)
         {
             tour = execJoueur(joueur, tour, nbrede, tablede, nbre_de_joueurs, pickos);
+            tailleListe = comptElt(pickos);
         }
     }
+
+    comptPoints(joueur, nbre_de_joueurs); // On comptabilise les scores de chacun pour la délibération
+    max = joueur[0].score;
+    for (int i = 1; i < nbre_de_joueurs; i++)
+    { // boucle de comparaison du max de pickos gagnés
+        if (joueur[i].score > max)
+        {
+            max = joueur[i].score;
+            index = i;
+        }
+    }
+
+    printf("\n\n%s a becte plus de pickominos!", joueur[index].nom);
 }
 
 void exec(int nbre_de_joueurs, Liste *pickos, int choix_menu)
@@ -451,6 +617,18 @@ void exec(int nbre_de_joueurs, Liste *pickos, int choix_menu)
     free(joueur);
 }
 
+void comptPoints(Joueur *joueur, int nbre_de_joueurs)
+{
+    for (int i = 0; i < nbre_de_joueurs; i++)
+    {
+        while (joueur[i].pickominos->elt->valeur != 0)
+        {
+            joueur[i].score += joueur[i].pickominos->elt->point;
+            joueur[i].pickominos->elt = joueur[i].pickominos->elt->precedent;
+        }
+    }
+}
+
 int quiCommence(int nbre_de_joueurs)
 { // on tire aléatoirement un nombre entre 1 et le nombre de joueurs, les joueurs ayant chacun choisi un nombre. Celui qui a le nombre est tiré au sort commence
     int n = 0;
@@ -459,18 +637,45 @@ int quiCommence(int nbre_de_joueurs)
     return n;
 }
 
-void rendre_picko(Liste *plateau, Element *picko)
+void rendrePicko(Liste *pickos, Joueur *joueur)
 {
-    /*vu que je n'ai pas encore de listes doublement chainées, je vais rajoutter en debut de liste*/
-    /*picko = malloc(sizeof(picko));*/
-    if (plateau == NULL || picko == NULL)
+    int val = 0;
+    Element *p = NULL; // pointeur intermédiaire pour garder l'elt à restituer sur la brochette
+    reInitPicko(pickos);
+    val = joueur->pickominos->elt->valeur;
+    if (val != 0)
     {
-        exit(EXIT_FAILURE);
+        while (pickos->premier->valeur < val) // On cherche l'emplacement exact dans la liste
+        {
+            pickos->premier = pickos->premier->suivant;
+        }
+
+        p = joueur->pickominos->elt;
+        joueur->pickominos->elt = joueur->pickominos->elt->precedent;
+        joueur->pickominos->elt->suivant = NULL;
+        p->suivant = pickos->premier;
+        p->precedent = pickos->premier->precedent;
+        pickos->premier->precedent->suivant = p;
+        pickos->premier->precedent = p;
     }
-    picko->suivant = plateau->premier;
-    plateau->premier = picko;
 }
 
+int comptElt(Liste *pickos)
+{
+    int val = pickos->premier->valeur, compt = 1;
+    if (pickos->premier->suivant != NULL)
+    {
+        pickos->premier = pickos->premier->suivant;
+    }
+
+    while (pickos->premier->valeur != val)
+    {
+        compt++;
+        pickos->premier = pickos->premier->suivant;
+    }
+
+    return compt;
+}
 void viderBuffer()
 {
     int c = 0;

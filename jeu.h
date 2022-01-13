@@ -25,7 +25,7 @@ struct Liste
 
 struct Pile
 {
-    Element *premier;
+    Element *elt;
 };
 
 struct Joueur
@@ -49,3 +49,10 @@ void exec(int, Liste *, int);
 int execJoueur(Joueur *, int, int, int *, int, Liste *);
 void reInitTable(Joueur *);
 int eligiblePicko(Joueur *);
+void reInitPicko(Liste *);
+int majPileJoueur(int, int, int, Joueur *, int, Liste *, int);
+int verifInferieurProche(Liste *, int, int);
+void rendrePicko(Liste *, Joueur *);
+void affichePickosVisibles(Joueur *, int);
+int comptElt(Liste *);
+void comptPoints(Joueur *, int);

@@ -8,7 +8,7 @@ int main(void)
     int choix_menu = 0, nbre_de_joueurs = 0;
     Liste *pickominos = init();
 
-    viderBuffer();
+    // viderBuffer();
     menu();
     scanf("%d", &choix_menu);
     switch (choix_menu)
