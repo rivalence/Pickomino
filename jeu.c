@@ -134,7 +134,7 @@ Liste *init()
     trente->valeur = 30;
     trente->point = 3;
     trente->suivant = trente_un;
-    trente->precedent = trente_deux;
+    trente->precedent = vingt_neuf;
     trente_un->valeur = 31;
     trente_un->point = 3;
     trente_un->suivant = trente_deux;
@@ -233,7 +233,8 @@ void menu()
     printf("************************\n\n");
     printf("1. Jouer contre IA\n");
     printf("2. Jouer en multijoueur\n");
-    printf("3. Sortir\n");
+    printf("3. Consulter les scores\n");
+    printf("4. Sortir\n");
 }
 
 void initJoueur(Joueur *joueur, Pile *pickominos)
@@ -682,6 +683,7 @@ int majPileJoueur(int total_val, int choix_picko, int tour, Joueur *joueur, int 
             }
             else
             {
+                printf("pickos vaut %d et choix vaut %d\n", pickos->premier->valeur, choix_picko);
                 joueur[tour - 1].pickominos->elt->suivant = pickos->premier;
                 pickos->premier->precedent->suivant = pickos->premier->suivant;
                 pickos->premier->suivant->precedent = pickos->premier->precedent;
@@ -777,6 +779,7 @@ void deroulementJeu(Liste *pickos, Joueur *joueur, int *tablede, int nbre_de_jou
 {
     int tour = 0, tailleListe = 5, max = 0, index = 0;
     Pile *pickominos = malloc(nbre_de_joueurs * sizeof(*pickominos));
+    clock_t tic = 0, toc = 0;
 
     tour = quiCommence(nbre_de_joueurs);
 
@@ -790,11 +793,17 @@ void deroulementJeu(Liste *pickos, Joueur *joueur, int *tablede, int nbre_de_jou
         scanf("%s", joueur[0].nom);
         strcpy(joueur[1].nom, "IA");
 
+        tic = clock();
         while (tailleListe != 1)
         {
             if (tour == 1)
             {
                 tour = execJoueur(joueur, tour, tablede, nbre_de_joueurs, pickos);
+                toc = clock();
+                if ((double)(toc - tic) / CLOCKS_PER_SEC > 60)
+                {
+                    viderPickos(pickos);
+                }
                 tailleListe = comptElt(pickos);
             }
             else
@@ -813,9 +822,15 @@ void deroulementJeu(Liste *pickos, Joueur *joueur, int *tablede, int nbre_de_jou
             scanf("%s", joueur[i].nom);
         }
 
+        tic = clock();
         while (tailleListe != 1)
         {
             tour = execJoueur(joueur, tour, tablede, nbre_de_joueurs, pickos);
+            toc = clock();
+            if ((double)(toc - tic) / CLOCKS_PER_SEC > 60)
+            {
+                viderPickos(pickos);
+            }
             tailleListe = comptElt(pickos);
         }
     }
@@ -832,6 +847,18 @@ void deroulementJeu(Liste *pickos, Joueur *joueur, int *tablede, int nbre_de_jou
     }
 
     printf("\n\n%s a becte plus de pickominos!", joueur[index].nom);
+    sauvScore(joueur, nbre_de_joueurs);
+}
+
+void viderPickos(Liste *pickos)
+{
+    reInitPicko(pickos);
+    if (comptElt(pickos) > 1)
+    {
+        pickos->premier = pickos->premier->precedent;
+        pickos->premier->suivant = NULL;
+        pickos->premier->precedent = NULL;
+    }
 }
 
 void exec(int nbre_de_joueurs, Liste *pickos, int choix_menu)
@@ -914,94 +941,97 @@ void viderBuffer()
     }
 }
 
-char* maj(struct Joueur *joueur){
+char *maj(Joueur *joueur)
+{
     int i;
     /*printf("\n Entrez la chaîne à convertir en majuscule: ");
     gets(str);*/
-    for (i = 0; joueur->nom[i]!='\0'; i++) {
-        /* si les caractères sont en minuscules, convertissez-les 
+    for (i = 0; joueur->nom[i] != '\0'; i++)
+    {
+        /* si les caractères sont en minuscules, convertissez-les
             en majuscules en soustrayant 32 de leur valeur ASCII. */
-        if(joueur->nom[i] >= 'a' && joueur->nom[i] <= 'z') {
-            joueur->nom[i] = joueur->nom[i] -32;
+        if (joueur->nom[i] >= 'a' && joueur->nom[i] <= 'z')
+        {
+            joueur->nom[i] = joueur->nom[i] - 32;
         }
     }
     return (joueur->nom);
 }
 
-void lire_score_joueur(void){
-    FILE* fichier = NULL ; 
-    char* ret ; 
-    int i;
-    char joueur[20]; 
-    char player1[20]; 
-    char player2[20] ; 
-    char player3[20] ;
-    char player4[20]; 
-    char player5[20] ; 
-    char player6[20] ; 
-    int score3 , score1 ,score2 ,score4 ,score5 , score6 ; 
-    char* ret2 , ret3 , ret4 , ret5 , ret6 ;
+void lireScoreJoueur()
+{
+    FILE *fichier = NULL;
+    int i, compt = 0;
+    char nom_joueur[20];
+    char *ret = NULL;
+    ListeNOM liste[6];
 
-    fichier = fopen("sauv_scores.txt", "r"); 
-    if (fichier != NULL){
+    fichier = fopen("sauv_scores.txt", "r");
+    if (fichier != NULL)
+    {
         /*printf("fichier ouvert , vous pouvez work wit\n");*/
-        printf("ENTREZ SVP LE NOM DU JOUEUR DONT VOUS VOULEZ AFFICHER LES SCORES !!!\n");
-        scanf("%s",joueur);
-        for (i = 0; joueur[i]!='\0'; i++) {
-        /* si les caractères sont en minuscules, convertissez-les 
-            en majuscules en soustrayant 32 de leur valeur ASCII. */
-            if(joueur[i] >= 'a' && joueur[i] <= 'z') {
-                joueur[i] = joueur[i] -32;
+        printf("ENTREZ SVP LE NOM DU JOUEUR DONT VOUS VOULEZ AFFICHER LES SCORES : ");
+        scanf("%s", nom_joueur);
+        for (i = 0; nom_joueur[i] != '\0'; i++)
+        {
+            /* si les caractères sont en minuscules, convertissez-les
+                en majuscules en soustrayant 32 de leur valeur ASCII. */
+            if (nom_joueur[i] >= 'a' && nom_joueur[i] <= 'z')
+            {
+                nom_joueur[i] = nom_joueur[i] - 32;
             }
         }
+
         while (!feof(fichier))
         {
-            
-            fscanf(fichier, "%s %d %s %d %s %d %s %d %s %d %s %d",player1 ,&score1, player2 , &score2, player3, &score3, player4, &score4, player5, &score5, player6, &score6 ); 
-            ret = strstr(player1, joueur);
-            ret2 = strstr(player2,joueur);
-            ret3 = strstr(player3,joueur);
-            ret4 = strstr(player4,joueur);
-            ret5 = strstr(player5, joueur);
-            ret6 = strstr(player6,joueur);
-            if(ret != NULL || ret2 != NULL || ret3 != NULL || ret4 != NULL || ret5 != NULL || ret6 != NULL){
-                printf("%s %d %s %d %s %d %s %d %s %d %s %d\n",player1,score1, player2, score2, player3, score3, player3, score3, player3, score3, player3, score3 ); 
+            i = -1;
+            do
+            {
+                i++;
+                strcpy(liste[i].nom, " ");
+                fscanf(fichier, "%s %d ", liste[i].nom, &liste[i].score); // Lecture d'une ligne complète du fichier
+            } while (strcmp(liste[i].nom, " "));
+
+            compt += i + 1;
+            i = 0;
+            while (i < 6 && ret == NULL)
+            {
+                strcpy(ret, strstr(liste[i].nom, nom_joueur));
+                i++;
+            }
+
+            if (ret != NULL) // On affiche les résultats si le nom existe dans la base de données
+            {
+                for (i = 0; i < compt - 1; i++)
+                {
+                    printf("%s %d vs ", liste[i].nom, liste[i].score);
+                }
+                printf("%s %d\n", liste[compt - 1].nom, liste[compt - 1].score);
             }
         }
     }
 }
 
-void sauv_score (struct Joueur *joueur1){/*cette fonction permet d'ecrire les scores dans un fichier en mettant en maj la premier lettre*/
+void sauvScore(Joueur *joueur1, int mode)
+{                         /*cette fonction permet d'ecrire les scores dans un fichier en mettant en maj la premier lettre*/
+    FILE *fichier = NULL; /*creation d'un descripteur de fichier qui servira de passerelle pour manipuler le fichier*/
+    int i;
+    printf("on est dans le fichier");
+    fichier = fopen("scores.txt", "a+"); /*ouverture du fichier en ecriture à la fin du fichier grace au descripteur*/
+    //  le fichier sera créé s'il n'existe pas
 
-/*joueur joueur1......joueur6
-tableau de joueur
-je met tout en maj */
-
-
-    
-    FILE* fichier = NULL ; /*creation d'un descripteur de fichier qui servira de passerelle pour manipuler le fichier*/
-    
-    
-    fichier = fopen("sauv_scores.txt", "a+"); /*ouverture du fichier en ecriture à la fin du fichier grace au descripteur*/
-    /*le fichier sera créé s'il n'existe pas*/
-    int mode ;/*permettra d'appeler la fonction mode() pour savoir si c'est vs IA ou Player*/ 
-    int i ; 
-    mode = 4 ;
-    for ( i = 0; i < mode; i++)
-    {
-        strcpy(joueur1[i].nom, maj(&joueur1[i]));
-        printf("%s",joueur1[i].nom);
-    }
-    
-    
-    if (fichier != NULL){  /* verification de l'ouverture du fichier*/
-        for (i = 0; i < mode; i++){
+    if (fichier != NULL)
+    { /* verification de l'ouverture du fichier*/
+        for (i = 0; i < mode; i++)
+        {
+            strcpy(joueur1[i].nom, maj(&joueur1[i]));
             fprintf(fichier, "%s %d ", joueur1[i].nom, joueur1[i].score);
         }
         fprintf(fichier, "\n");
-
-    }else{ /*en cas de non ouverture du fichier*/
-        printf("ERREUR! lors de l'ouverture"); 
+    }
+    else
+    { /*en cas de non ouverture du fichier*/
+        printf("ERREUR! lors de l'ouverture");
     }
     fclose(fichier);
 }

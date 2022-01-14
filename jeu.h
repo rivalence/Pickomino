@@ -9,6 +9,12 @@ typedef struct Element Element;
 typedef struct Liste Liste;
 typedef struct Joueur Joueur;
 typedef struct Pile Pile;
+typedef struct ListeNOM ListeNOM;
+struct ListeNOM
+{
+    char nom[15];
+    int score;
+};
 struct Element
 {
     int valeur;
@@ -58,6 +64,7 @@ int comptElt(Liste *);
 void comptPoints(Joueur *, int);
 int execIA(Liste *, Joueur *, int, int, int *);
 int majTableIA(int *, int, Joueur *);
-char* maj(Joueur *) ;
-void lire_score_joueur();
-void sauv_score(Joueur * ); 
+void viderPickos(Liste *);
+char *maj(Joueur *);
+void lireScoreJoueur();
+void sauvScore(Joueur *, int);
