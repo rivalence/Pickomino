@@ -913,3 +913,95 @@ void viderBuffer()
         c = getchar();
     }
 }
+
+char* maj(struct Joueur *joueur){
+    int i;
+    /*printf("\n Entrez la chaîne à convertir en majuscule: ");
+    gets(str);*/
+    for (i = 0; joueur->nom[i]!='\0'; i++) {
+        /* si les caractères sont en minuscules, convertissez-les 
+            en majuscules en soustrayant 32 de leur valeur ASCII. */
+        if(joueur->nom[i] >= 'a' && joueur->nom[i] <= 'z') {
+            joueur->nom[i] = joueur->nom[i] -32;
+        }
+    }
+    return (joueur->nom);
+}
+
+void lire_score_joueur(void){
+    FILE* fichier = NULL ; 
+    char* ret ; 
+    int i;
+    char joueur[20]; 
+    char player1[20]; 
+    char player2[20] ; 
+    char player3[20] ;
+    char player4[20]; 
+    char player5[20] ; 
+    char player6[20] ; 
+    int score3 , score1 ,score2 ,score4 ,score5 , score6 ; 
+    char* ret2 , ret3 , ret4 , ret5 , ret6 ;
+
+    fichier = fopen("sauv_scores.txt", "r"); 
+    if (fichier != NULL){
+        /*printf("fichier ouvert , vous pouvez work wit\n");*/
+        printf("ENTREZ SVP LE NOM DU JOUEUR DONT VOUS VOULEZ AFFICHER LES SCORES !!!\n");
+        scanf("%s",joueur);
+        for (i = 0; joueur[i]!='\0'; i++) {
+        /* si les caractères sont en minuscules, convertissez-les 
+            en majuscules en soustrayant 32 de leur valeur ASCII. */
+            if(joueur[i] >= 'a' && joueur[i] <= 'z') {
+                joueur[i] = joueur[i] -32;
+            }
+        }
+        while (!feof(fichier))
+        {
+            
+            fscanf(fichier, "%s %d %s %d %s %d %s %d %s %d %s %d",player1 ,&score1, player2 , &score2, player3, &score3, player4, &score4, player5, &score5, player6, &score6 ); 
+            ret = strstr(player1, joueur);
+            ret2 = strstr(player2,joueur);
+            ret3 = strstr(player3,joueur);
+            ret4 = strstr(player4,joueur);
+            ret5 = strstr(player5, joueur);
+            ret6 = strstr(player6,joueur);
+            if(ret != NULL || ret2 != NULL || ret3 != NULL || ret4 != NULL || ret5 != NULL || ret6 != NULL){
+                printf("%s %d %s %d %s %d %s %d %s %d %s %d\n",player1,score1, player2, score2, player3, score3, player3, score3, player3, score3, player3, score3 ); 
+            }
+        }
+    }
+}
+
+void sauv_score (struct Joueur *joueur1){/*cette fonction permet d'ecrire les scores dans un fichier en mettant en maj la premier lettre*/
+
+/*joueur joueur1......joueur6
+tableau de joueur
+je met tout en maj */
+
+
+    
+    FILE* fichier = NULL ; /*creation d'un descripteur de fichier qui servira de passerelle pour manipuler le fichier*/
+    
+    
+    fichier = fopen("sauv_scores.txt", "a+"); /*ouverture du fichier en ecriture à la fin du fichier grace au descripteur*/
+    /*le fichier sera créé s'il n'existe pas*/
+    int mode ;/*permettra d'appeler la fonction mode() pour savoir si c'est vs IA ou Player*/ 
+    int i ; 
+    mode = 4 ;
+    for ( i = 0; i < mode; i++)
+    {
+        strcpy(joueur1[i].nom, maj(&joueur1[i]));
+        printf("%s",joueur1[i].nom);
+    }
+    
+    
+    if (fichier != NULL){  /* verification de l'ouverture du fichier*/
+        for (i = 0; i < mode; i++){
+            fprintf(fichier, "%s %d ", joueur1[i].nom, joueur1[i].score);
+        }
+        fprintf(fichier, "\n");
+
+    }else{ /*en cas de non ouverture du fichier*/
+        printf("ERREUR! lors de l'ouverture"); 
+    }
+    fclose(fichier);
+}
