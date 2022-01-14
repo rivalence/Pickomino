@@ -58,3 +58,6 @@ int comptElt(Liste *);
 void comptPoints(Joueur *, int);
 int execIA(Liste *, Joueur *, int, int, int *);
 int majTableIA(int *, int, Joueur *);
+char* maj(Joueur *) ;
+void lire_score_joueur();
+void sauv_score(Joueur * ); 
