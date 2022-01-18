@@ -838,7 +838,7 @@ void deroulementJeu(Liste *pickos, Joueur *joueur, int *tablede, int nbre_de_jou
             {
                 tour = execJoueur(joueur, tour, tablede, nbre_de_joueurs, pickos);
                 toc = clock();                                 // On récupère l'heure à chaque changement de tour
-                if ((double)(toc - tic) / CLOCKS_PER_SEC > 60) // On arrête la partie si on joue depuis 10 min ou plus
+                if ((double)(toc - tic) / CLOCKS_PER_SEC > (300 * nbre_de_joueurs)) // On arrête la partie si on joue depuis 10 min ou plus
                 {
                     // viderPickos(pickos);
                     tailleListe = 1;
@@ -869,7 +869,7 @@ void deroulementJeu(Liste *pickos, Joueur *joueur, int *tablede, int nbre_de_jou
         {
             tour = execJoueur(joueur, tour, tablede, nbre_de_joueurs, pickos);
             toc = clock();                                // On récupère l'heure à chaque changement de tour
-            if ((double)(toc - tic) / CLOCKS_PER_SEC > 5) // On arrête la partie si on joue depuis 10 min ou plus
+            if ((double)(toc - tic) / CLOCKS_PER_SEC > (300 * nbre_de_joueurs)) // On arrête la partie si on joue depuis 10 min ou plus
             {
                 // viderPickos(pickos);
                 tailleListe = 1;
