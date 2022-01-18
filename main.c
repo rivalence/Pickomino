@@ -5,18 +5,22 @@
 
 int main(void)
 {
-    int choix_menu = 0, nbre_de_joueurs = 0;
-    Liste *pickominos = init();
-
-    // viderBuffer();
+    int choix_menu = 0, nbre_de_joueurs = 0, *tablede = (int *)malloc(MAXTABLE * sizeof(*tablede));
+    Liste *pickominos = (Liste *)malloc(sizeof(pickominos));
+    Joueur joueur[MAXJOUEUR];
+    FILE *fichier = NULL; // creation d'un descripteur de fichier qui servira de passerelle pour manipuler le fichier
+    init(pickominos, 1);
     do
     {
+        printf("\n\n");
         menu();
         scanf("%d", &choix_menu);
         switch (choix_menu)
         {
         case 1:
             nbre_de_joueurs = 2;
+            deroulementJeu(pickominos, joueur, tablede, nbre_de_joueurs, choix_menu);
+            sauvScore(joueur, nbre_de_joueurs, fichier);
             break;
 
         case 2:
@@ -27,22 +31,27 @@ int main(void)
                 printf("Pour le multijoueur, il faut 2 a 7 joueurs :");
                 scanf("%d", &nbre_de_joueurs);
             }
+
+            deroulementJeu(pickominos, joueur, tablede, nbre_de_joueurs, choix_menu);
+            sauvScore(joueur, nbre_de_joueurs, fichier);
             break;
 
         case 3:
             lireScoreJoueur();
             break;
 
-        case 4:
-            printf("Sortie du jeu...");
-            exit(EXIT_SUCCESS);
-            break;
         default:
+            printf("Sortie du jeu...");
             break;
         }
-        exec(nbre_de_joueurs, pickominos, choix_menu);
-    } while (choix_menu != 4);
+    } while (choix_menu == 1 || choix_menu == 2 || choix_menu == 3);
 
+    if (tablede != NULL)
+    {
+        free(tablede);
+    }
+
+    init(pickominos, 0);
     viderBuffer();
 
     return 0;

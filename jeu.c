@@ -64,9 +64,8 @@ int majTableJoueur(int *tablede, int taille_tablede, int choix_joueur, Joueur *j
     return c; // c vaudra -1 si le choix du joueur ne figure pas dans la table de dé proposée. Il passera alors son tour
 }
 
-Liste *init()
+void init(Liste *picko, int liberer)
 { /*au final faudra une doublement chainee*/
-    Liste *picko = malloc(sizeof(*picko));
     Element *vingt_un = malloc(sizeof(*vingt_un));
     Element *vingt_deux = malloc(sizeof(*vingt_deux));
     Element *vingt_trois = malloc(sizeof(*vingt_trois));
@@ -89,78 +88,99 @@ Liste *init()
     {
         exit(EXIT_FAILURE);
     }
-    picko->premier = vingt_un;
-    picko->dernier = trente_six;
-    sentinelle->valeur = 0;
-    sentinelle->point = 0;
-    sentinelle->suivant = vingt_un;
-    sentinelle->precedent = trente_six;
-    vingt_un->valeur = 21;
-    vingt_un->point = 1;
-    vingt_un->suivant = vingt_deux;
-    vingt_un->precedent = sentinelle;
-    vingt_deux->valeur = 22;
-    vingt_deux->point = 1;
-    vingt_deux->suivant = vingt_trois;
-    vingt_deux->precedent = vingt_un;
-    vingt_trois->valeur = 23;
-    vingt_trois->point = 1;
-    vingt_trois->suivant = vingt_quatre;
-    vingt_trois->precedent = vingt_deux;
-    vingt_quatre->valeur = 24;
-    vingt_quatre->point = 1;
-    vingt_quatre->suivant = vingt_cinq;
-    vingt_quatre->precedent = vingt_trois;
-    vingt_cinq->valeur = 25;
-    vingt_cinq->point = 2;
-    vingt_cinq->suivant = vingt_six;
-    vingt_cinq->precedent = vingt_quatre;
-    vingt_six->valeur = 26;
-    vingt_six->point = 2;
-    vingt_six->suivant = vingt_sept;
-    vingt_six->precedent = vingt_cinq;
-    vingt_sept->valeur = 27;
-    vingt_sept->point = 2;
-    vingt_sept->suivant = vingt_huit;
-    vingt_sept->precedent = vingt_six;
-    vingt_huit->valeur = 28;
-    vingt_huit->point = 2;
-    vingt_huit->suivant = vingt_neuf;
-    vingt_huit->precedent = vingt_sept;
-    vingt_neuf->valeur = 29;
-    vingt_neuf->point = 3;
-    vingt_neuf->suivant = trente;
-    vingt_neuf->precedent = vingt_huit;
-    trente->valeur = 30;
-    trente->point = 3;
-    trente->suivant = trente_un;
-    trente->precedent = vingt_neuf;
-    trente_un->valeur = 31;
-    trente_un->point = 3;
-    trente_un->suivant = trente_deux;
-    trente_un->precedent = trente;
-    trente_deux->valeur = 32;
-    trente_deux->point = 3;
-    trente_deux->suivant = trente_trois;
-    trente_deux->precedent = trente_un;
-    trente_trois->valeur = 33;
-    trente_trois->point = 4;
-    trente_trois->suivant = trente_quatre;
-    trente_trois->precedent = trente_deux;
-    trente_quatre->valeur = 34;
-    trente_quatre->point = 4;
-    trente_quatre->suivant = trente_cinq;
-    trente_quatre->precedent = trente_trois;
-    trente_cinq->valeur = 35;
-    trente_cinq->point = 4;
-    trente_cinq->suivant = trente_six;
-    trente_cinq->precedent = trente_quatre;
-    trente_six->valeur = 36;
-    trente_six->point = 4;
-    trente_six->suivant = sentinelle;
-    trente_six->precedent = trente_cinq;
-
-    return picko;
+    if (liberer == 1)
+    {
+        picko->premier = vingt_un;
+        picko->dernier = trente_six;
+        sentinelle->valeur = 0;
+        sentinelle->point = 0;
+        sentinelle->suivant = vingt_un;
+        sentinelle->precedent = trente_six;
+        vingt_un->valeur = 21;
+        vingt_un->point = 1;
+        vingt_un->suivant = vingt_deux;
+        vingt_un->precedent = sentinelle;
+        vingt_deux->valeur = 22;
+        vingt_deux->point = 1;
+        vingt_deux->suivant = vingt_trois;
+        vingt_deux->precedent = vingt_un;
+        vingt_trois->valeur = 23;
+        vingt_trois->point = 1;
+        vingt_trois->suivant = vingt_quatre;
+        vingt_trois->precedent = vingt_deux;
+        vingt_quatre->valeur = 24;
+        vingt_quatre->point = 1;
+        vingt_quatre->suivant = vingt_cinq;
+        vingt_quatre->precedent = vingt_trois;
+        vingt_cinq->valeur = 25;
+        vingt_cinq->point = 2;
+        vingt_cinq->suivant = vingt_six;
+        vingt_cinq->precedent = vingt_quatre;
+        vingt_six->valeur = 26;
+        vingt_six->point = 2;
+        vingt_six->suivant = vingt_sept;
+        vingt_six->precedent = vingt_cinq;
+        vingt_sept->valeur = 27;
+        vingt_sept->point = 2;
+        vingt_sept->suivant = vingt_huit;
+        vingt_sept->precedent = vingt_six;
+        vingt_huit->valeur = 28;
+        vingt_huit->point = 2;
+        vingt_huit->suivant = vingt_neuf;
+        vingt_huit->precedent = vingt_sept;
+        vingt_neuf->valeur = 29;
+        vingt_neuf->point = 3;
+        vingt_neuf->suivant = trente;
+        vingt_neuf->precedent = vingt_huit;
+        trente->valeur = 30;
+        trente->point = 3;
+        trente->suivant = trente_un;
+        trente->precedent = vingt_neuf;
+        trente_un->valeur = 31;
+        trente_un->point = 3;
+        trente_un->suivant = trente_deux;
+        trente_un->precedent = trente;
+        trente_deux->valeur = 32;
+        trente_deux->point = 3;
+        trente_deux->suivant = trente_trois;
+        trente_deux->precedent = trente_un;
+        trente_trois->valeur = 33;
+        trente_trois->point = 4;
+        trente_trois->suivant = trente_quatre;
+        trente_trois->precedent = trente_deux;
+        trente_quatre->valeur = 34;
+        trente_quatre->point = 4;
+        trente_quatre->suivant = trente_cinq;
+        trente_quatre->precedent = trente_trois;
+        trente_cinq->valeur = 35;
+        trente_cinq->point = 4;
+        trente_cinq->suivant = trente_six;
+        trente_cinq->precedent = trente_quatre;
+        trente_six->valeur = 36;
+        trente_six->point = 4;
+        trente_six->suivant = sentinelle;
+        trente_six->precedent = trente_cinq;
+    }
+    else
+    {
+        free(picko);
+        free(vingt_un);
+        free(vingt_deux);
+        free(vingt_trois);
+        free(vingt_quatre);
+        free(vingt_cinq);
+        free(vingt_six);
+        free(vingt_sept);
+        free(vingt_huit);
+        free(vingt_neuf);
+        free(trente);
+        free(trente_un);
+        free(trente_deux);
+        free(trente_trois);
+        free(trente_quatre);
+        free(trente_cinq);
+        free(trente_six);
+    }
 }
 
 void affichepicko(Liste *pickos)
@@ -237,7 +257,7 @@ void menu()
     printf("4. Sortir\n");
 }
 
-void initJoueur(Joueur *joueur, Pile *pickominos)
+void initJoueur(Joueur *joueur)
 {
     joueur->score = 0;
     for (int i = 0; i < MAXTABLE; i++)
@@ -245,11 +265,7 @@ void initJoueur(Joueur *joueur, Pile *pickominos)
         joueur->table_joueur[i] = 0;
     }
 
-    joueur->pickominos = pickominos;
-    joueur->pickominos->elt->valeur = 0;
-    joueur->pickominos->elt->point = 0;
-    joueur->pickominos->elt->precedent = NULL;
-    joueur->pickominos->elt->suivant = NULL;
+    joueur->pickominos = NULL;
 }
 
 void reInitTable(Joueur *joueur)
@@ -300,7 +316,7 @@ int execJoueur(Joueur *joueur, int tour, int *tablede, int nbre_de_joueurs, List
     while (nbrede > 0)
     {
         affichePickosVisibles(joueur, nbre_de_joueurs);
-        printf("\n\nVotre table -> [ ");
+        printf("\n\nVotre table -> [ "); // Affiche la table du joueur
         i = 0;
         while (joueur[tour - 1].table_joueur[i] != 0)
         {
@@ -390,7 +406,6 @@ int execJoueur(Joueur *joueur, int tour, int *tablede, int nbre_de_joueurs, List
                     affichePickosVisibles(joueur, nbre_de_joueurs);
                     reInitPicko(pickos);
                     affichepicko(pickos);
-                    printf("\nVOTRE TOTAL SUR LES LANCES -> %d", total_val);
                     if (total_val < 21 || total_val > 36)
                     { // Si le total est éligible ou pas au choix d'un pickomino
                         verif = 0;
@@ -406,7 +421,7 @@ int execJoueur(Joueur *joueur, int tour, int *tablede, int nbre_de_joueurs, List
                     reInitTable(&joueur[tour - 1]);                                                              // On remet la table du joueur à 0
                     if (verif == 0)
                     { // Verif vaut -1 si aucun pickomino n'a été alloué au joueur, sinon, il vaut 1
-                        printf("\nVotre choix ne correspond à aucun pickomino eligible.\nRestitution de votre pickomino visible en cours...\n");
+                        printf("\nVotre choix ne correspond a aucun pickomino eligible.\nRestitution de votre pickomino visible en cours...\n");
                         rendrePicko(pickos, &joueur[tour - 1]);
                         tour++;
                         nbrede = 0;
@@ -511,7 +526,7 @@ int execIA(Liste *pickos, Joueur *joueur, int tour, int nbre_de_joueurs, int *ta
                 else
                 {
                     verif = -1;
-                    if (total_val == joueur[tour - 2].pickominos->elt->valeur)
+                    if (total_val == joueur[tour - 2].pickominos->valeur)
                     {
                         verif = majPileJoueur(total_val, total_val, tour, joueur, verif, pickos, nbre_de_joueurs); // L'IA empile le pickomino visible de l'adversaire
                         reInitTable(&joueur[tour - 1]);
@@ -646,13 +661,13 @@ void affichePickosVisibles(Joueur *joueur, int nbre_de_joueurs)
     printf("\nPickominos visibles: \n"); // affichage du pickomino visible de chaque joueur
     for (int i = 0; i < nbre_de_joueurs; i++)
     {
-        if (joueur[i].pickominos->elt->valeur == 0)
+        if (joueur[i].pickominos == NULL)
         {
             printf("%s -> [ ]\n", joueur[i].nom);
         }
         else
         {
-            printf("%s -> [ %d ]\n", joueur[i].nom, joueur[i].pickominos->elt->valeur);
+            printf("%s -> [ %d ]\n", joueur[i].nom, joueur[i].pickominos->valeur);
         }
     }
 }
@@ -669,28 +684,51 @@ int majPileJoueur(int total_val, int choix_picko, int tour, Joueur *joueur, int 
     nbre_element_liste = comptElt(pickos);
     while (pickos->premier->valeur != 0 && verif != 1) // Fin des lancés de dés, on parcoure les pickominos et on vérifie si lee total du joueur fait qu'il en bénéficie d'un.
     {
-        if (choix_picko == pickos->premier->valeur && choix_picko == total_val)
+        if (choix_picko == pickos->premier->valeur && choix_picko == total_val) // séquence de changement quand la valeur exacte est choisie
         {
             if (nbre_element_liste == 2)
             {
-                joueur[tour - 1].pickominos->elt->suivant = pickos->premier;
-                pickos->premier->precedent->suivant = NULL;
-                pickos->premier->precedent->precedent = NULL;
-                pickos->premier = pickos->premier->precedent;
-                joueur[tour - 1].pickominos->elt->suivant->precedent = joueur[tour - 1].pickominos->elt;
-                joueur[tour - 1].pickominos->elt->suivant->suivant = NULL;
-                joueur[tour - 1].pickominos->elt = joueur[tour - 1].pickominos->elt->suivant;
+                if (joueur[tour - 1].pickominos != NULL)
+                {
+                    joueur[tour - 1].pickominos->suivant = pickos->premier;
+                    pickos->premier->precedent->suivant = NULL;
+                    pickos->premier->precedent->precedent = NULL;
+                    pickos->premier = pickos->premier->precedent;
+                    joueur[tour - 1].pickominos->suivant->precedent = joueur[tour - 1].pickominos;
+                    joueur[tour - 1].pickominos->suivant->suivant = NULL;
+                    joueur[tour - 1].pickominos = joueur[tour - 1].pickominos->suivant;
+                }
+                else
+                { // Quand le joueur prend son premier pickomino
+                    joueur[tour - 1].pickominos = pickos->premier;
+                    pickos->premier->precedent->suivant = NULL;
+                    pickos->premier->precedent->precedent = NULL;
+                    pickos->premier = pickos->premier->precedent;
+                    joueur[tour - 1].pickominos->suivant = NULL;
+                    joueur[tour - 1].pickominos->precedent = NULL;
+                }
             }
             else
             {
-                printf("pickos vaut %d et choix vaut %d\n", pickos->premier->valeur, choix_picko);
-                joueur[tour - 1].pickominos->elt->suivant = pickos->premier;
-                pickos->premier->precedent->suivant = pickos->premier->suivant;
-                pickos->premier->suivant->precedent = pickos->premier->precedent;
-                pickos->premier = pickos->premier->suivant;
-                joueur[tour - 1].pickominos->elt->suivant->precedent = joueur[tour - 1].pickominos->elt;
-                joueur[tour - 1].pickominos->elt->suivant->suivant = NULL;
-                joueur[tour - 1].pickominos->elt = joueur[tour - 1].pickominos->elt->suivant;
+                if (joueur[tour - 1].pickominos != NULL)
+                {
+                    joueur[tour - 1].pickominos->suivant = pickos->premier;
+                    pickos->premier->precedent->suivant = pickos->premier->suivant;
+                    pickos->premier->suivant->precedent = pickos->premier->precedent;
+                    pickos->premier = pickos->premier->suivant;
+                    joueur[tour - 1].pickominos->suivant->precedent = joueur[tour - 1].pickominos;
+                    joueur[tour - 1].pickominos->suivant->suivant = NULL;
+                    joueur[tour - 1].pickominos = joueur[tour - 1].pickominos->suivant;
+                }
+                else
+                { // Quand le joueur prend son premier pickomino
+                    joueur[tour - 1].pickominos = pickos->premier;
+                    pickos->premier->precedent->suivant = pickos->premier->suivant;
+                    pickos->premier->suivant->precedent = pickos->premier->precedent;
+                    pickos->premier = pickos->premier->suivant;
+                    joueur[tour - 1].pickominos->suivant = NULL;
+                    joueur[tour - 1].pickominos->precedent = NULL;
+                }
             }
 
             verif = 1; // Notre booléen prend la valeur un si un pickomino est attribué avec succès à un jour
@@ -711,14 +749,14 @@ int majPileJoueur(int total_val, int choix_picko, int tour, Joueur *joueur, int 
             }
             else
             {
-                if (choix_picko == joueur[i].pickominos->elt->valeur)
+                if (choix_picko == joueur[i].pickominos->valeur)
                 { // Le joueur actuel prend le pickomino visible d'un autre joueur
-                    joueur[tour - 1].pickominos->elt->suivant = joueur[i].pickominos->elt;
-                    joueur[i].pickominos->elt = joueur[i].pickominos->elt->precedent;
-                    joueur[i].pickominos->elt->suivant = NULL;
-                    joueur[tour - 1].pickominos->elt->suivant->precedent = joueur[tour - 1].pickominos->elt;
-                    joueur[tour - 1].pickominos->elt = joueur[tour - 1].pickominos->elt->suivant;
-                    joueur[tour - 1].pickominos->elt->suivant = NULL;
+                    joueur[tour - 1].pickominos->suivant = joueur[i].pickominos;
+                    joueur[i].pickominos = joueur[i].pickominos->precedent;
+                    joueur[i].pickominos->suivant = NULL;
+                    joueur[tour - 1].pickominos->suivant->precedent = joueur[tour - 1].pickominos;
+                    joueur[tour - 1].pickominos = joueur[tour - 1].pickominos->suivant;
+                    joueur[tour - 1].pickominos->suivant = NULL;
                     verif = 1;
                     break;
                 }
@@ -777,34 +815,38 @@ int verifInferieurProche(Liste *pickos, int choix_picko, int total_val)
 
 void deroulementJeu(Liste *pickos, Joueur *joueur, int *tablede, int nbre_de_joueurs, int choix_menu)
 {
-    int tour = 0, tailleListe = 5, max = 0, index = 0;
-    Pile *pickominos = malloc(nbre_de_joueurs * sizeof(*pickominos));
-    clock_t tic = 0, toc = 0;
+    int tour = 0, tailleListe = 5, i = 0;
+    // pickominos = malloc(nbre_de_joueurs * sizeof(Pile));
+    clock_t tic = 0, toc = 0; // On partira sur des parties de 10 min maximum
 
     tour = quiCommence(nbre_de_joueurs);
 
-    if (nbre_de_joueurs == 2 && choix_menu == 1) // Si IA
+    if (choix_menu == 1) // Si IA
     {
         for (int i = 0; i < nbre_de_joueurs; i++) // initialisation des données de chaque joueur
         {
-            initJoueur(&joueur[i], &pickominos[i]);
+            initJoueur(&joueur[i]);
         }
-        printf("Entrez le nom du joueur :");
+        printf("Entrez le nom du joueur : (Pas de point)");
         scanf("%s", joueur[0].nom);
         strcpy(joueur[1].nom, "IA");
 
         tic = clock();
-        while (tailleListe != 1)
+        while (tailleListe != 1) // On joue tant que la brochette comporte des pickominos (taille > 1)
         {
             if (tour == 1)
             {
                 tour = execJoueur(joueur, tour, tablede, nbre_de_joueurs, pickos);
-                toc = clock();
-                if ((double)(toc - tic) / CLOCKS_PER_SEC > 60)
+                toc = clock();                                 // On récupère l'heure à chaque changement de tour
+                if ((double)(toc - tic) / CLOCKS_PER_SEC > 60) // On arrête la partie si on joue depuis 10 min ou plus
                 {
-                    viderPickos(pickos);
+                    // viderPickos(pickos);
+                    tailleListe = 1;
                 }
-                tailleListe = comptElt(pickos);
+                else
+                {
+                    tailleListe = comptElt(pickos);
+                }
             }
             else
             {
@@ -815,39 +857,32 @@ void deroulementJeu(Liste *pickos, Joueur *joueur, int *tablede, int nbre_de_jou
     }
     else
     {
-        for (int i = 0; i < nbre_de_joueurs; i++) // initialisation des données de chaque joueur
+        for (i = 0; i < nbre_de_joueurs; i++) // initialisation des données de chaque joueur
         {
-            initJoueur(&joueur[i], &pickominos[i]);
-            printf("Entrez le nom du joueur %d: ", i + 1);
+            initJoueur(&joueur[i]);
+            printf("Entrez le nom du joueur %d: (Pas de point)", i + 1);
             scanf("%s", joueur[i].nom);
         }
 
         tic = clock();
-        while (tailleListe != 1)
+        while (tailleListe != 1) // On joue tant que la brochette comporte des pickominos (taille > 1)
         {
             tour = execJoueur(joueur, tour, tablede, nbre_de_joueurs, pickos);
-            toc = clock();
-            if ((double)(toc - tic) / CLOCKS_PER_SEC > 60)
+            toc = clock();                                // On récupère l'heure à chaque changement de tour
+            if ((double)(toc - tic) / CLOCKS_PER_SEC > 5) // On arrête la partie si on joue depuis 10 min ou plus
             {
-                viderPickos(pickos);
+                // viderPickos(pickos);
+                tailleListe = 1;
             }
-            tailleListe = comptElt(pickos);
+            else
+            {
+                tailleListe = comptElt(pickos);
+            }
         }
     }
 
-    comptPoints(joueur, nbre_de_joueurs); // On comptabilise les scores de chacun pour la délibération
-    max = joueur[0].score;
-    for (int i = 1; i < nbre_de_joueurs; i++)
-    { // boucle de comparaison du max de pickos gagnés
-        if (joueur[i].score > max)
-        {
-            max = joueur[i].score;
-            index = i;
-        }
-    }
-
-    printf("\n\n%s a becte plus de pickominos!", joueur[index].nom);
-    sauvScore(joueur, nbre_de_joueurs);
+    comptPoints(joueur, nbre_de_joueurs);  // On comptabilise les scores de chacun pour la délibération
+    deliberation(joueur, nbre_de_joueurs); // Affichage des scores
 }
 
 void viderPickos(Liste *pickos)
@@ -861,25 +896,17 @@ void viderPickos(Liste *pickos)
     }
 }
 
-void exec(int nbre_de_joueurs, Liste *pickos, int choix_menu)
-{
-    int *tablede = malloc(MAXTABLE * sizeof(int));
-    Joueur *joueur = malloc(nbre_de_joueurs * sizeof(*joueur));
-
-    deroulementJeu(pickos, joueur, tablede, nbre_de_joueurs, choix_menu);
-
-    free(tablede);
-    free(joueur);
-}
-
 void comptPoints(Joueur *joueur, int nbre_de_joueurs)
 {
     for (int i = 0; i < nbre_de_joueurs; i++)
     {
-        while (joueur[i].pickominos->elt->valeur != 0)
+        if (joueur[i].pickominos != NULL)
         {
-            joueur[i].score += joueur[i].pickominos->elt->point;
-            joueur[i].pickominos->elt = joueur[i].pickominos->elt->precedent;
+            do
+            {
+                joueur[i].score += joueur[i].pickominos->point;
+                joueur[i].pickominos = joueur[i].pickominos->precedent;
+            } while (joueur[i].pickominos != NULL);
         }
     }
 }
@@ -897,21 +924,24 @@ void rendrePicko(Liste *pickos, Joueur *joueur)
     int val = 0;
     Element *p = NULL; // pointeur intermédiaire pour garder l'elt à restituer sur la brochette
     reInitPicko(pickos);
-    val = joueur->pickominos->elt->valeur;
-    if (val != 0)
+    if (joueur->pickominos != NULL)
     {
-        while (pickos->premier->valeur < val) // On cherche l'emplacement exact dans la liste
+        val = joueur->pickominos->valeur;
+        if (val != 0)
         {
-            pickos->premier = pickos->premier->suivant;
-        }
+            while (pickos->premier->valeur < val) // On cherche l'emplacement exact dans la liste
+            {
+                pickos->premier = pickos->premier->suivant;
+            }
 
-        p = joueur->pickominos->elt;
-        joueur->pickominos->elt = joueur->pickominos->elt->precedent;
-        joueur->pickominos->elt->suivant = NULL;
-        p->suivant = pickos->premier;
-        p->precedent = pickos->premier->precedent;
-        pickos->premier->precedent->suivant = p;
-        pickos->premier->precedent = p;
+            p = joueur->pickominos;
+            joueur->pickominos = joueur->pickominos->precedent;
+            joueur->pickominos->suivant = NULL;
+            p->suivant = pickos->premier;
+            p->precedent = pickos->premier->precedent;
+            pickos->premier->precedent->suivant = p;
+            pickos->premier->precedent = p;
+        }
     }
 }
 
@@ -941,6 +971,17 @@ void viderBuffer()
     }
 }
 
+void deliberation(Joueur *joueur, int nbre_de_joueurs)
+{
+    printf("\n\nFIN DE LA PARTIE.\nScores : ");
+    for (int i = 0; i < nbre_de_joueurs; i++)
+    { // boucle de comparaison du max de pickos gagnés
+        printf("%s : %d\t", joueur[i].nom, joueur[i].score);
+    }
+
+    printf("\n\n");
+}
+
 char *maj(Joueur *joueur)
 {
     int i;
@@ -961,12 +1002,11 @@ char *maj(Joueur *joueur)
 void lireScoreJoueur()
 {
     FILE *fichier = NULL;
-    int i, compt = 0;
+    int i = 0, compt = 0, existe = 0;
     char nom_joueur[20];
-    char *ret = NULL;
-    ListeNOM liste[6];
+    ListeNOM liste[8];
 
-    fichier = fopen("sauv_scores.txt", "r");
+    fichier = fopen("scores.txt", "r");
     if (fichier != NULL)
     {
         /*printf("fichier ouvert , vous pouvez work wit\n");*/
@@ -985,53 +1025,73 @@ void lireScoreJoueur()
         while (!feof(fichier))
         {
             i = -1;
+
             do
             {
                 i++;
-                strcpy(liste[i].nom, " ");
                 fscanf(fichier, "%s %d ", liste[i].nom, &liste[i].score); // Lecture d'une ligne complète du fichier
-            } while (strcmp(liste[i].nom, " "));
+            } while (strcmp(liste[i].nom, ".") != 0);
 
-            compt += i + 1;
+            compt = i;
             i = 0;
-            while (i < 6 && ret == NULL)
+            while (i < 7)
             {
-                strcpy(ret, strstr(liste[i].nom, nom_joueur));
-                i++;
+                if (strstr(liste[i].nom, nom_joueur) != NULL)
+                {
+                    i = 10;
+                }
+                else
+                {
+                    i++;
+                }
             }
 
-            if (ret != NULL) // On affiche les résultats si le nom existe dans la base de données
+            if (i == 10) // On affiche les résultats si le nom existe dans la base de données
             {
-                for (i = 0; i < compt - 1; i++)
+                existe = 1;
+                for (int j = 0; j < compt - 1; j++)
                 {
-                    printf("%s %d vs ", liste[i].nom, liste[i].score);
+                    printf("%s: %d vs ", liste[j].nom, liste[j].score);
                 }
-                printf("%s %d\n", liste[compt - 1].nom, liste[compt - 1].score);
+                printf("%s: %d\n", liste[compt - 1].nom, liste[compt - 1].score);
+            }
+            else
+            {
+                existe = 0;
             }
         }
+
+        if (existe == 0)
+        {
+            printf("\nCe nom n'existe pas en tant joueur\n");
+        }
+    }
+    else
+    {
+        fprintf(stderr, "Can't open score file. Please try again later\n");
     }
 }
 
-void sauvScore(Joueur *joueur1, int mode)
-{                         /*cette fonction permet d'ecrire les scores dans un fichier en mettant en maj la premier lettre*/
-    FILE *fichier = NULL; /*creation d'un descripteur de fichier qui servira de passerelle pour manipuler le fichier*/
-    int i;
-    printf("on est dans le fichier");
-    fichier = fopen("scores.txt", "a+"); /*ouverture du fichier en ecriture à la fin du fichier grace au descripteur*/
-    //  le fichier sera créé s'il n'existe pas
+void sauvScore(Joueur *joueur, int mode, FILE *fichier) /*cette fonction permet d'ecrire les scores dans un fichier en mettant en maj la premier lettre*/
+{
+    int i = 0;
+    printf("Sauvegarde...\n");
+    fichier = fopen("scores.txt", "a"); // Ouverture du fichier. Celui-ci sera créé s'il n'existe pas
+    // printf("On pass l'ouverture");
 
     if (fichier != NULL)
-    { /* verification de l'ouverture du fichier*/
+    { // verification de l'ouverture du fichier
         for (i = 0; i < mode; i++)
         {
-            strcpy(joueur1[i].nom, maj(&joueur1[i]));
-            fprintf(fichier, "%s %d ", joueur1[i].nom, joueur1[i].score);
+            strcpy(joueur[i].nom, maj(&joueur[i]));
+            fprintf(fichier, "%s %d ", joueur[i].nom, joueur[i].score);
         }
-        fprintf(fichier, "\n");
+
+        fprintf(fichier, ".\n");
+        fclose(fichier);
     }
     else
-    { /*en cas de non ouverture du fichier*/
-        printf("ERREUR! lors de l'ouverture");
+    { // en cas de non ouverture du fichier
+        perror("ERREUR LORS DE L'OUVERTURE DU FICHIER...");
     }
-    fclose(fichier);
 }
